@@ -1,0 +1,8 @@
+#include <windows.h>
+#include "resource.h"
+
+IDI_APP ICON "mensura.ico"
+
+#define VER_DESC "Mensura - Claude usage limits widget (by Sallador)"
+#define VER_ORIGNAME "Mensura.exe"
+#include "version.rc2"

@@ -1,0 +1,9 @@
+#include <windows.h>
+#include "resource.h"
+
+IDI_APP ICON "mensura.ico"
+IDR_PAYLOAD RCDATA "..\\bin\\Mensura.exe"
+
+#define VER_DESC "Mensura Setup (by Sallador)"
+#define VER_ORIGNAME "Mensura_Setup_1.0.0.exe"
+#include "version.rc2"
