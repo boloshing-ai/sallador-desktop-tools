@@ -8,14 +8,21 @@ Version 1.1.0 · Developer: **Sallador**
 
 <img src="../docs/noctis.png" width="360">
 
+## Turn the screen off at any moment
+
+Noctis is more than a timer. Stepping away from your desk, listening to music in the dark, or just want the display off right now? Turn it off instantly, without waiting for the inactivity timeout:
+
+- **Desktop button.** The installer can place a **Turn off screen** shortcut on your desktop and in the Start menu. Double-click it and the display goes dark.
+- **In the app.** Use the **Turn off screen** button in the Noctis panel, or the same command in the tray icon menu.
+- **Hotkey.** **Ctrl + Alt + M** works from any application.
+- **Command line.** `Noctis.exe /off` — for scripts, Task Scheduler or your own shortcuts.
+
+The screen wakes up as usual: move the mouse or press any key. Noctis switches the display off only after you release the mouse button or keys, and ignores accidental mouse jitter during the first 1.5 seconds, so the screen does not light up again by itself.
+
 ## Features
 
 - **Inactivity timeout** — 1 / 3 / 5 / 10 / 15 / 30 minutes, or any value from 1 to 240 minutes.
-- **Turn the screen off now** — use any of these:
-  - **Ctrl + Alt + M**
-  - the *Turn off screen* button
-  - a desktop / Start menu shortcut
-  - `Noctis.exe /off`
+- **Instant screen-off** — desktop button, app button, tray menu, Ctrl + Alt + M or `Noctis.exe /off` (see above).
 - **Protection from accidental wake-up** — the screen turns off only after you release the keys or mouse button. Mouse jitter in the first 1.5 seconds turns it off again.
 - **Games and video** — the screen is not turned off while a full-screen app is running. This can be disabled.
 - **Protection from "alarm clocks"** — if a program, not you, wakes the screen, Noctis turns it off again.
@@ -59,14 +66,21 @@ Settings are stored in `HKCU\Software\Sallador\Noctis`.
 
 Версия 1.1.0 · Разработчик: **Sallador**
 
+## Выключение экрана в любой момент
+
+Noctis — не только таймер. Отошли от компьютера, слушаете музыку в темноте или просто хотите погасить экран прямо сейчас? Выключите его мгновенно, не дожидаясь срабатывания таймера:
+
+- **Кнопка на рабочем столе.** Установщик может разместить на рабочем столе и в меню «Пуск» ярлык **«Выключить экран»**. Двойной щелчок — и экран гаснет.
+- **В приложении.** Кнопка **«Выключить экран»** в панели Noctis или одноимённый пункт в меню значка в трее.
+- **Сочетание клавиш.** **Ctrl + Alt + M** работает из любого приложения.
+- **Командная строка.** `Noctis.exe /off` — для скриптов, Планировщика заданий или собственных ярлыков.
+
+Экран включается как обычно — достаточно пошевелить мышью или нажать любую клавишу. Noctis выключает экран только после того, как вы отпустите кнопку мыши или клавиши, и не реагирует на случайное дрожание мыши в первые полторы секунды, поэтому экран не загорается снова сам по себе.
+
 ## Возможности
 
 - **Время бездействия** — 1 / 3 / 5 / 10 / 15 / 30 минут или любое значение от 1 до 240 минут.
-- **Выключить экран сразу** — любым из способов:
-  - **Ctrl + Alt + M**
-  - кнопка «Выключить экран»
-  - ярлык на рабочем столе или в «Пуске»
-  - `Noctis.exe /off`
+- **Мгновенное выключение экрана** — кнопкой на рабочем столе, в приложении, через меню в трее, сочетанием Ctrl + Alt + M или командой `Noctis.exe /off` (см. выше).
 - **Защита от случайного пробуждения** — экран гаснет только после того, как отпущены клавиши или кнопка мыши. Дрожание мыши в первые 1,5 секунды снова гасит экран.
 - **Игры и видео** — пока открыто полноэкранное приложение, экран не выключается. Можно отключить.
 - **Защита от «будильников»** — если экран включила программа, а не вы, Noctis снова его выключает.
