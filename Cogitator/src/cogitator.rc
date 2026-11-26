@@ -1,0 +1,8 @@
+#include <windows.h>
+#include "resource.h"
+
+IDI_APP ICON "cogitator.ico"
+
+#define VER_DESC "Cogitator - top applications monitor widget (by Sallador)"
+#define VER_ORIGNAME "Cogitator.exe"
+#include "version.rc2"

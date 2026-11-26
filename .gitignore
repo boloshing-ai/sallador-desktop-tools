@@ -1,0 +1,9 @@
+# build output — installers are published as GitHub Releases
+build/
+bin/
+dist/
+*.obj
+*.res
+*.pdb
+*.ilk
+.claude/

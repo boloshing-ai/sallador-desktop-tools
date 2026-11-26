@@ -1,0 +1,8 @@
+#include <windows.h>
+#include "resource.h"
+
+IDI_APP ICON "noctis.ico"
+
+#define VER_DESC "Noctis - turns the monitor off after inactivity (by Sallador)"
+#define VER_ORIGNAME "Noctis.exe"
+#include "version.rc2"
