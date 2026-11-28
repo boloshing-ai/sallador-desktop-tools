@@ -50,6 +50,8 @@ struct FluentTheme {
     Color success, successBg, caution, critical;
 };
 static FluentTheme T;
+static void (*g_themeHook)(void);
+static BOOL g_textShadow;                // soft shadow under text (see-through widget backgrounds)       // called at the end of LoadTheme (custom text colour)
 
 static DWORD ReadDw(const WCHAR* key, const WCHAR* name, DWORD def) {
     DWORD v = 0, sz = sizeof(v);
@@ -95,6 +97,7 @@ static void LoadTheme() {
         T.success = Color(255, 0x0F, 0x7B, 0x0F); T.successBg = Color(255, 0xDF, 0xF6, 0xDD);
         T.caution = Color(255, 0x9D, 0x5D, 0x00); T.critical = Color(255, 0xC4, 0x2B, 0x1C);
     }
+    if (g_themeHook) g_themeHook();
 }
 
 // Rounded corners, dark/light frame and Mica / Acrylic backdrop. The window must strip its
@@ -217,6 +220,12 @@ static void FText(Graphics& g, const WCHAR* s, Font* f, const Color& c, const Re
     sf.SetAlignment(al == AL_CENTER ? StringAlignmentCenter : al == AL_RIGHT ? StringAlignmentFar : StringAlignmentNear);
     sf.SetLineAlignment(StringAlignmentCenter);
     sf.SetTrimming(trim);
+    if (g_textShadow && c.GetA() > 0x40) {
+        BOOL light = c.GetR() * 299 + c.GetG() * 587 + c.GetB() * 114 > 128000;
+        SolidBrush sh(light ? Color((BYTE)(c.GetA() * 0.75), 0, 0, 0) : Color((BYTE)(c.GetA() * 0.6), 255, 255, 255));
+        RectF rs(r.X + 1, r.Y + 1, r.Width, r.Height);
+        g.DrawString(s, -1, f, rs, &sf, &sh);
+    }
     SolidBrush b(c);
     g.DrawString(s, -1, f, r, &sf, &b);
 }

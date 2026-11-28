@@ -1,4 +1,4 @@
-// Sensus 1.0 — desktop widget: hardware sensors (clocks, loads, memory, temperatures, fans, power).
+﻿// Sensus 1.1 — desktop widget: hardware sensors (clocks, loads, memory, temperatures, fans, power).
 // Windows 11 (Fluent) edition. Developer: Sallador.  Pure Win32 + GDI+, static CRT.
 //
 // Sources (no driver, no admin rights):
@@ -37,6 +37,7 @@
 #include "resource.h"
 #include "fluent.h"
 #include "lang.h"
+#include "appearance.h"
 
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "shell32.lib")
@@ -749,10 +750,10 @@ static void Render(HWND h, HDC hdc, Canvas& cv, int w, int hh, void (*paint)(Gra
         Bitmap bm(w, hh, w * 4, PixelFormat32bppPARGB, (BYTE*)cv.bits);
         Graphics g(&bm);
         Prep(g);
-        g.Clear(T.backdrop ? Color(0, 0, 0, 0) : T.solidBg);
+        ClearBg(g, h, w, hh);
         paint(g);
     }
-    BitBlt(hdc, 0, 0, w, hh, cv.dc, 0, 0, SRCCOPY);
+    PresentFrame(h, hdc, cv, w, hh);
 }
 static void Relayout() {
     int oldH = g_h, oldW = g_w;
@@ -778,6 +779,7 @@ static void ApplyBackdrop() {
     bd = T.backdrop;
     SendMessageW(g_hwnd, WM_NCACTIVATE, TRUE, 0);
     (void)bd;
+    ApplyLayered(g_hwnd);                           // see-through background mode (appearance.h)
 }
 
 // ───────────────────────────── settings window ───────────────────────
@@ -1017,12 +1019,13 @@ static void ShowMenu(POINT pt) {
     AppendMenuW(m, MF_POPUP, (UINT_PTR)cols, TR(L"Расположение", L"Layout"));
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
     AppendMenuW(m, MF_STRING | (g_acrylic ? MF_CHECKED : 0), ID_ACRYLIC, TR(L"Прозрачный фон", L"Transparent background"));
+    AppendAppearanceMenu(m);
     AppendMenuW(m, MF_STRING | (g_topmost ? MF_CHECKED : 0), ID_TOPMOST, TR(L"Поверх всех окон", L"Always on top"));
     AppendMenuW(m, MF_STRING | (IsAutostart() ? MF_CHECKED : 0), ID_AUTOSTART, TR(L"Запускать вместе с Windows", L"Start with Windows"));
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
     AppendMenuW(m, MF_STRING, ID_SHOWHIDE, g_visible ? TR(L"Скрыть виджет", L"Hide widget") : TR(L"Показать виджет", L"Show widget"));
     AppendLangMenu(m, REG_KEY);
-    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, TR(L"Sensus 1.0 · разработчик Sallador", L"Sensus 1.0 · by Sallador"));
+    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, TR(L"Sensus 1.1 · разработчик Sallador", L"Sensus 1.1 · by Sallador"));
     AppendMenuW(m, MF_STRING, ID_EXIT, TR(L"Выход", L"Exit"));
     SetForegroundWindow(g_hwnd);
     TrackPopupMenu(m, TPM_RIGHTBUTTON, pt.x, pt.y, 0, g_hwnd, NULL);
@@ -1114,6 +1117,7 @@ static LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM w, LPARAM l) {
     case WM_COMMAND: {
         int id = LOWORD(w);
         if (id >= ID_LANG_AUTO && id <= ID_LANG_EN) { RestartForLang(REG_KEY, id - ID_LANG_AUTO, g_demo ? L"/demo" : NULL); g_exiting = TRUE; DestroyWindow(h); return 0; }
+        if (HandleAppearanceCmd(h, id, REG_KEY)) { ApplyBackdrop(); InvalidateRect(h, NULL, FALSE); if (g_set) InvalidateRect(g_set, NULL, FALSE); return 0; }
         if (id == ID_SETTINGS)       OpenSettings();
         else if (id >= ID_COLS_AUTO && id <= ID_COLS_2) { g_colMode = id - ID_COLS_AUTO; RegSetDw(L"Columns", g_colMode); g_scroll = 0; Relayout(); }
         else if (id >= ID_EVERY_1 && id <= ID_EVERY_5) { static const int secs[3] = { 1, 2, 5 }; g_every = secs[id - ID_EVERY_1]; RegSetDw(L"Every", g_every); }
@@ -1166,6 +1170,7 @@ static BOOL CreateMainWindow() {
 int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR cmd, int) {
     g_hInst = hInst;
     InitLang(REG_KEY);
+    LoadAppearance(REG_KEY); g_themeHook = ApplyTextColor;
     g_demo = cmd && wcsstr(cmd, L"/demo") != NULL;
     g_mutexLang = CreateMutexW(NULL, TRUE, g_demo ? L"Local\\Sensus_Sallador_Demo" : L"Local\\Sensus_Sallador_SingleInstance");
     if (GetLastError() == ERROR_ALREADY_EXISTS) {

@@ -17,6 +17,7 @@ Five tiny native utilities for Windows 11 by **Sallador**, built in the Windows 
 - **Native and lightweight** — pure C++ / Win32 + GDI+, no .NET, Electron or browser engine. A single small `.exe`, only a few MB of RAM.
 - **Windows 11 look** — Mica / Acrylic backdrop, rounded corners, Segoe UI Variable, Segoe Fluent Icons, Settings-style toggles. They follow the system light/dark theme and accent colour automatically.
 - **No admin rights** (except Velox, see its README) — per-user installer (`%LOCALAPPDATA%\Programs`), uninstall from *Settings → Apps*. Silent install supported.
+- **Your look** — in the menu of the desktop widgets (Cogitator, Mensura, Velox, Sensus): background transparency up to 90 % with the text staying fully bright, an optional text shadow, and any text colour.
 - **Start with Windows** — optional, can be turned on in the installer or the app menu.
 - **Russian and English interface.** The language follows Windows and can be switched in the app menu (*Language · Язык*).
 
@@ -24,11 +25,11 @@ Five tiny native utilities for Windows 11 by **Sallador**, built in the Windows 
 
 Get the installers from **[Releases](../../releases)**:
 
-- `Cogitator_Setup_2.2.0.exe`
+- `Cogitator_Setup_2.3.0.exe`
 - `Noctis_Setup_1.2.0.exe`
-- `Mensura_Setup_1.1.0.exe`
-- `Velox_Setup_1.1.0.exe`
-- `Sensus_Setup_1.0.0.exe`
+- `Mensura_Setup_1.2.0.exe`
+- `Velox_Setup_1.2.0.exe`
+- `Sensus_Setup_1.1.0.exe`
 
 The installers are not code-signed, so Windows SmartScreen may show *"Windows protected your PC"*. Click **More info → Run anyway**.
 
@@ -61,6 +62,7 @@ Tested on Windows 11.
 - **Нативные и лёгкие** — чистый C++ / Win32 + GDI+, без .NET, Electron и браузерного движка. Один небольшой `.exe`, несколько мегабайт памяти.
 - **Внешний вид Windows 11** — подложка Mica / Acrylic, скруглённые углы, Segoe UI Variable, значки Segoe Fluent Icons, переключатели как в «Параметрах». Сами подстраиваются под светлую/тёмную тему и акцентный цвет системы.
 - **Без прав администратора** (кроме Velox, см. его описание) — установка в профиль пользователя (`%LOCALAPPDATA%\Programs`), удаление через «Параметры → Приложения». Есть тихая установка.
+- **Свой вид** — в меню виджетов (Cogitator, Mensura, Velox, Sensus): прозрачность фона до 90 % (текст при этом остаётся ярким), тень под текстом и любой цвет текста.
 - **Автозапуск с Windows** — по желанию, включается в установщике или в меню программы.
 - **Интерфейс на русском и английском.** Язык выбирается по языку Windows, переключить его можно в меню программы («Язык · Language»).
 
@@ -68,11 +70,11 @@ Tested on Windows 11.
 
 Установщики — в разделе **[Releases](../../releases)**:
 
-- `Cogitator_Setup_2.2.0.exe`
+- `Cogitator_Setup_2.3.0.exe`
 - `Noctis_Setup_1.2.0.exe`
-- `Mensura_Setup_1.1.0.exe`
-- `Velox_Setup_1.1.0.exe`
-- `Sensus_Setup_1.0.0.exe`
+- `Mensura_Setup_1.2.0.exe`
+- `Velox_Setup_1.2.0.exe`
+- `Sensus_Setup_1.1.0.exe`
 
 Установщики не подписаны цифровой подписью, поэтому SmartScreen может показать *«Система Windows защитила ваш компьютер»*. Нажмите **Подробнее → Выполнить в любом случае**.
 

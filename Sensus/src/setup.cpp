@@ -1,4 +1,4 @@
-﻿// Sensus Setup 1.0 — Windows 11 (Fluent) installer / uninstaller. Developer: Sallador.
+﻿// Sensus Setup 1.1 — Windows 11 (Fluent) installer / uninstaller. Developer: Sallador.
 // Per-user install (no admin): %LOCALAPPDATA%\Programs\Sensus
 //
 //   Setup.exe                                  interactive install
@@ -29,7 +29,7 @@
 
 #define APP_NAME     L"Sensus"
 #define APP_EXE      L"Sensus.exe"
-#define APP_VERSION  L"1.0.0"
+#define APP_VERSION  L"1.1.0"
 #define PUBLISHER    L"Sallador"
 #define APP_CLASS    L"SensusWidget"
 #define REG_APP      L"Software\\Sallador\\Sensus"

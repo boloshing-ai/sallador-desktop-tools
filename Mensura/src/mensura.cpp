@@ -1,4 +1,4 @@
-﻿// Mensura 1.1 — desktop widget: remaining Claude plan usage limits (session / weekly).
+﻿// Mensura 1.2 — desktop widget: remaining Claude plan usage limits (session / weekly).
 // Windows 11 (Fluent) edition. Developer: Sallador.  Pure Win32 + GDI+ + WinHTTP, static CRT.
 //
 // Data source: the local Claude Code sign-in (%USERPROFILE%\.claude\.credentials.json) and the
@@ -25,6 +25,7 @@
 #include "resource.h"
 #include "fluent.h"
 #include "lang.h"
+#include "appearance.h"
 
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "shell32.lib")
@@ -625,10 +626,10 @@ static void Render(HDC hdc) {
         Bitmap bm(g_w, g_h, g_w * 4, PixelFormat32bppPARGB, (BYTE*)g_cv.bits);
         Graphics g(&bm);
         Prep(g);
-        g.Clear(T.backdrop ? Color(0, 0, 0, 0) : T.solidBg);
+        ClearBg(g, g_hwnd, g_w, g_h);
         PaintTo(g);
     }
-    BitBlt(hdc, 0, 0, g_w, g_h, g_cv.dc, 0, 0, SRCCOPY);
+    PresentFrame(g_hwnd, hdc, g_cv, g_w, g_h);
 }
 static void Relayout() {
     int oldH = g_h;
@@ -644,6 +645,7 @@ static void ApplyBackdrop() {
     if (g_acrylic) ApplyFrame(g_hwnd, BACKDROP_ACRYLIC);
     else { ApplyFrame(g_hwnd, 1 /*DWMSBT_NONE*/); T.backdrop = FALSE; }
     SendMessageW(g_hwnd, WM_NCACTIVATE, TRUE, 0);   // the widget is never activated; render the backdrop as active
+    ApplyLayered(g_hwnd);                           // see-through background mode (appearance.h)
 }
 static void ApplyThemeAll() {
     LoadTheme();
@@ -751,12 +753,13 @@ static void ShowMenu(POINT pt) {
     AppendMenuW(m, MF_STRING | (g_warn ? MF_CHECKED : 0), ID_WARN, TR(L"Предупреждать при 80 % и 95 %", L"Warn at 80 % and 95 %"));
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
     AppendMenuW(m, MF_STRING | (g_acrylic ? MF_CHECKED : 0), ID_ACRYLIC, TR(L"Прозрачный фон", L"Transparent background"));
+    AppendAppearanceMenu(m);
     AppendMenuW(m, MF_STRING | (g_topmost ? MF_CHECKED : 0), ID_TOPMOST, TR(L"Поверх всех окон", L"Always on top"));
     AppendMenuW(m, MF_STRING | (IsAutostart() ? MF_CHECKED : 0), ID_AUTOSTART, TR(L"Запускать вместе с Windows", L"Start with Windows"));
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
     AppendMenuW(m, MF_STRING, ID_SHOWHIDE, g_visible ? TR(L"Скрыть виджет", L"Hide widget") : TR(L"Показать виджет", L"Show widget"));
     AppendLangMenu(m, REG_KEY);
-    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, TR(L"Mensura 1.1 · разработчик Sallador", L"Mensura 1.1 · by Sallador"));
+    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, TR(L"Mensura 1.2 · разработчик Sallador", L"Mensura 1.2 · by Sallador"));
     AppendMenuW(m, MF_STRING, ID_EXIT, TR(L"Выход", L"Exit"));
     SetForegroundWindow(g_hwnd);
     TrackPopupMenu(m, TPM_RIGHTBUTTON, pt.x, pt.y, 0, g_hwnd, NULL);
@@ -886,6 +889,7 @@ static LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM w, LPARAM l) {
     case WM_COMMAND: {
         int id = LOWORD(w);
         if (id >= ID_LANG_AUTO && id <= ID_LANG_EN) { RestartForLang(REG_KEY, id - ID_LANG_AUTO, g_demo ? L"/demo" : NULL); g_exiting = TRUE; DestroyWindow(h); return 0; }
+        if (HandleAppearanceCmd(h, id, REG_KEY)) { ApplyBackdrop(); InvalidateRect(h, NULL, FALSE); return 0; }
         if (id == ID_TOPMOST)        { g_topmost = !g_topmost; RegSetDw(L"TopMost", g_topmost); ApplyTopmost(); }
         else if (id == ID_AUTOSTART) SetAutostart(!IsAutostart());
         else if (id == ID_ACRYLIC)   { g_acrylic = !g_acrylic; RegSetDw(L"Acrylic", g_acrylic); ApplyBackdrop(); InvalidateRect(h, NULL, FALSE); }
@@ -946,6 +950,7 @@ static BOOL CreateMainWindow() {
 int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR cmd, int) {
     g_hInst = hInst;
     InitLang(REG_KEY);
+    LoadAppearance(REG_KEY); g_themeHook = ApplyTextColor;
     g_demo = cmd && wcsstr(cmd, L"/demo") != NULL;
     g_mutexLang = CreateMutexW(NULL, TRUE, g_demo ? L"Local\\Mensura_Sallador_Demo" : L"Local\\Mensura_Sallador_SingleInstance");
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
