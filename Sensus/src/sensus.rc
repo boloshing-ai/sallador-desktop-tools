@@ -1,0 +1,8 @@
+#include <windows.h>
+#include "resource.h"
+
+IDI_APP ICON "sensus.ico"
+
+#define VER_DESC "Sensus - hardware sensors widget (by Sallador)"
+#define VER_ORIGNAME "Sensus.exe"
+#include "version.rc2"

@@ -1,8 +1,8 @@
-# Cogitator, Noctis, Mensura & Velox
+# Cogitator, Noctis, Mensura, Velox & Sensus
 
 **English** · [Русский](#русский)
 
-Four tiny native utilities for Windows 11 by **Sallador**, built in the Windows 11 Fluent Design style.
+Five tiny native utilities for Windows 11 by **Sallador**, built in the Windows 11 Fluent Design style.
 
 | | App | What it does |
 |---|---|---|
@@ -10,6 +10,7 @@ Four tiny native utilities for Windows 11 by **Sallador**, built in the Windows 
 | <img src="docs/noctis.png" width="260"> | **[Noctis](Noctis/)** | Turns the monitor off after N minutes of inactivity and wakes it on mouse or keyboard input — like the built-in Windows timer, but it doesn't let browsers, game launchers or drivers keep the screen awake. You can also turn the screen off instantly at any moment: with a button on the desktop, in the app, or with Ctrl + Alt + M. |
 | <img src="docs/mensura.png" width="260"> | **[Mensura](Mensura/)** | Desktop widget that keeps your remaining **Claude** plan usage in sight: the 5-hour session and weekly limits, with time until reset and warnings at 80 % and 95 %. Uses your Claude Code sign-in. |
 | <img src="docs/velox.png" width="260"> | **[Velox](Velox/)** | Desktop widget that shows which applications use the internet right now: download and upload speed per application, downloaded volume, total speed with a graph. |
+| <img src="docs/sensus.png" width="260"> | **[Sensus](Sensus/)** | Desktop widget with hardware sensors: clocks, loads, memory, GPU temperature and power, drive temperatures, network, plus CPU / motherboard temperatures and fans from AIDA64. Every sensor can be turned on or off. |
 
 ### Common to all
 
@@ -27,12 +28,13 @@ Get the installers from **[Releases](../../releases)**:
 - `Noctis_Setup_1.2.0.exe`
 - `Mensura_Setup_1.1.0.exe`
 - `Velox_Setup_1.1.0.exe`
+- `Sensus_Setup_1.0.0.exe`
 
 The installers are not code-signed, so Windows SmartScreen may show *"Windows protected your PC"*. Click **More info → Run anyway**.
 
 ### Building from source
 
-Requires Visual Studio 2022 (or Build Tools) with the *Desktop development with C++* workload. Run `build.bat` inside `Cogitator\`, `Noctis\`, `Mensura\` or `Velox\`. It produces `bin\<App>.exe` and the installer in `dist\`.
+Requires Visual Studio 2022 (or Build Tools) with the *Desktop development with C++* workload. Run `build.bat` inside `Cogitator\`, `Noctis\`, `Mensura\`, `Velox\` or `Sensus\`. It produces `bin\<App>.exe` and the installer in `dist\`.
 
 Tested on Windows 11.
 
@@ -40,11 +42,11 @@ Tested on Windows 11.
 
 <a id="русский"></a>
 
-# Cogitator, Noctis, Mensura и Velox
+# Cogitator, Noctis, Mensura, Velox и Sensus
 
-[English](#cogitator-noctis-mensura--velox) · **Русский**
+[English](#cogitator-noctis-mensura-velox--sensus) · **Русский**
 
-Четыре маленькие нативные утилиты для Windows 11 от **Sallador** в стиле Windows 11 (Fluent Design).
+Пять маленьких нативных утилит для Windows 11 от **Sallador** в стиле Windows 11 (Fluent Design).
 
 | | Программа | Что делает |
 |---|---|---|
@@ -52,6 +54,7 @@ Tested on Windows 11.
 | <img src="docs/noctis.png" width="260"> | **[Noctis](Noctis/)** | Выключает монитор после N минут бездействия и включает его при движении мыши или нажатии клавиши. Работает как встроенный таймер Windows, но браузеры, игровые клиенты и драйверы не мешают экрану погаснуть. Кроме того, экран можно выключить мгновенно в любой момент — кнопкой на рабочем столе, в приложении или сочетанием Ctrl + Alt + M. |
 | <img src="docs/mensura.png" width="260"> | **[Mensura](Mensura/)** | Виджет для рабочего стола с остатком лимитов подписки **Claude**: 5-часовая сессия и недельные лимиты, время до сброса и предупреждения при 80 % и 95 %. Использует вход в Claude Code. |
 | <img src="docs/velox.png" width="260"> | **[Velox](Velox/)** | Виджет для рабочего стола: какие приложения сейчас пользуются интернетом, скорость загрузки и отдачи каждого, скачанный объём и общая скорость с графиком. |
+| <img src="docs/sensus.png" width="260"> | **[Sensus](Sensus/)** | Виджет с датчиками компьютера: частоты, загрузка, память, температура и мощность видеокарты, температура дисков, сеть, а также температуры процессора и платы и вентиляторы из AIDA64. Любой параметр можно включить или выключить. |
 
 ### Общее для всех
 
@@ -69,11 +72,12 @@ Tested on Windows 11.
 - `Noctis_Setup_1.2.0.exe`
 - `Mensura_Setup_1.1.0.exe`
 - `Velox_Setup_1.1.0.exe`
+- `Sensus_Setup_1.0.0.exe`
 
 Установщики не подписаны цифровой подписью, поэтому SmartScreen может показать *«Система Windows защитила ваш компьютер»*. Нажмите **Подробнее → Выполнить в любом случае**.
 
 ### Сборка из исходников
 
-Нужна Visual Studio 2022 (или Build Tools) с компонентом *«Разработка классических приложений на C++»*. Запустите `build.bat` в папке `Cogitator\`, `Noctis\`, `Mensura\` или `Velox\` — получите `bin\<Программа>.exe` и установщик в `dist\`.
+Нужна Visual Studio 2022 (или Build Tools) с компонентом *«Разработка классических приложений на C++»*. Запустите `build.bat` в папке `Cogitator\`, `Noctis\`, `Mensura\`, `Velox\` или `Sensus\` — получите `bin\<Программа>.exe` и установщик в `dist\`.
 
 Проверено на Windows 11.
