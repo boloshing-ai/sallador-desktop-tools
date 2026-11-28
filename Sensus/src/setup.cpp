@@ -29,7 +29,7 @@
 
 #define APP_NAME     L"Sensus"
 #define APP_EXE      L"Sensus.exe"
-#define APP_VERSION  L"1.2.0"
+#define APP_VERSION  L"1.2.1"
 #define PUBLISHER    L"Sallador"
 #define APP_CLASS    L"SensusWidget"
 #define REG_APP      L"Software\\Sallador\\Sensus"

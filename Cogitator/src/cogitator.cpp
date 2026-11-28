@@ -470,7 +470,6 @@ static void PaintTo(Graphics& g) {
     DrawAppMark(g, D(14), D(14), D(16));
     FText(g, L"Cogitator", g_fStrong, T.text, RectF(D(38), 0, D(120), D(HDR_H)));
     REAL tw = FTextW(g, L"Cogitator", g_fStrong);
-    FText(g, L"·  Sallador", g_fCaption, T.text3, RectF(D(38) + tw + D(8), 0, D(120), D(HDR_H)));
     FText(g, g_showAll ? TR(L"Все процессы", L"All processes") : TR(L"Приложения", L"Apps"), g_fCaption, T.text3, RectF(D(W - 170), 0, D(124), D(HDR_H)), AL_RIGHT);
     RectF mr = RF(g_rc[H_MORE]);
     if (Hv(H_MORE)) FillRR(g, mr, D(4), Pr(H_MORE) ? T.subtlePress : T.subtleHover);

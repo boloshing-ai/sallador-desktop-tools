@@ -29,7 +29,7 @@
 
 #define APP_NAME     L"Cogitator"
 #define APP_EXE      L"Cogitator.exe"
-#define APP_VERSION  L"2.4.0"
+#define APP_VERSION  L"2.4.1"
 #define PUBLISHER    L"Sallador"
 #define APP_CLASS    L"CogitatorWidget"
 #define OLD_CLASS    L"Cogitator40kWidget"                 // v2.0

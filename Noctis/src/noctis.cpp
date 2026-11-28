@@ -278,7 +278,6 @@ static void PaintTo(Graphics& g) {
     FGlyph(g, GL_MOON, D(16), T.accent, RectF(D(16), D(16), D(20), D(20)));
     FText(g, L"Noctis", g_fStrong, T.text, RectF(D(46), D(10), D(120), D(32)));
     REAL tw = FTextW(g, L"Noctis", g_fStrong);
-    FText(g, L"·  Sallador", g_fCaption, T.text3, RectF(D(46) + tw + D(8), D(10), D(160), D(32)));
     RectF rc = RF(g_rc[H_CLOSE]);
     if (Hv(H_CLOSE)) FillRR(g, rc, D(4), Pr(H_CLOSE) ? T.subtlePress : T.subtleHover);
     FGlyph(g, GL_CANCEL, D(12), T.text2, rc);

@@ -527,7 +527,6 @@ static void PaintTo(Graphics& g) {
     DrawAppMark(g, D(14), D(14), D(16));
     FText(g, L"Velox", g_fStrong, T.text, RectF(D(38), 0, D(120), D(HDR_H)));
     REAL tw = FTextW(g, L"Velox", g_fStrong);
-    FText(g, L"·  Sallador", g_fCaption, T.text3, RectF(D(38) + tw + D(8), 0, D(120), D(HDR_H)));
     FText(g, g_etwOk ? (g_countLan ? TR(L"Интернет и локальная сеть", L"Internet and local network") : TR(L"Интернет", L"Internet")) : TR(L"Ограниченный режим", L"Limited mode"),
           g_fCaption, g_etwOk ? T.text3 : T.caution, RectF(D(W - 230), 0, D(184), D(HDR_H)), AL_RIGHT);
     RectF mr = RF(g_rc[H_MORE]);

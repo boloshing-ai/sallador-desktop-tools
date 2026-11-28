@@ -25,11 +25,11 @@ Five tiny native utilities for Windows 11 by **Sallador**, built in the Windows 
 
 Get the installers from **[Releases](../../releases)**:
 
-- `Cogitator_Setup_2.4.0.exe`
-- `Noctis_Setup_1.2.0.exe`
+- `Cogitator_Setup_2.4.1.exe`
+- `Noctis_Setup_1.2.1.exe`
 - `Mensura_Setup_1.3.0.exe`
-- `Velox_Setup_1.3.0.exe`
-- `Sensus_Setup_1.2.0.exe`
+- `Velox_Setup_1.3.1.exe`
+- `Sensus_Setup_1.2.1.exe`
 
 The installers are not code-signed, so Windows SmartScreen may show *"Windows protected your PC"*. Click **More info → Run anyway**.
 
@@ -70,11 +70,11 @@ Tested on Windows 11.
 
 Установщики — в разделе **[Releases](../../releases)**:
 
-- `Cogitator_Setup_2.4.0.exe`
-- `Noctis_Setup_1.2.0.exe`
+- `Cogitator_Setup_2.4.1.exe`
+- `Noctis_Setup_1.2.1.exe`
 - `Mensura_Setup_1.3.0.exe`
-- `Velox_Setup_1.3.0.exe`
-- `Sensus_Setup_1.2.0.exe`
+- `Velox_Setup_1.3.1.exe`
+- `Sensus_Setup_1.2.1.exe`
 
 Установщики не подписаны цифровой подписью, поэтому SmartScreen может показать *«Система Windows защитила ваш компьютер»*. Нажмите **Подробнее → Выполнить в любом случае**.
 

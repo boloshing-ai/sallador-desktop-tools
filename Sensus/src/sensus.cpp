@@ -705,7 +705,6 @@ static void PaintTo(Graphics& g) {
     DrawAppMark(g, D(14), D(14), D(16));
     FText(g, L"Sensus", g_fStrong, T.text, RectF(D(38), 0, D(120), D(HDR_H)));
     REAL tw = FTextW(g, L"Sensus", g_fStrong);
-    FText(g, L"·  Sallador", g_fCaption, T.text3, RectF(D(38) + tw + D(8), 0, D(120), D(HDR_H)));
     RectF mr = RF(g_rc[H_MORE]);
     if (Hv(H_MORE)) FillRR(g, mr, D(4), Pr(H_MORE) ? T.subtlePress : T.subtleHover);
     FGlyph(g, GL_MORE, D(14), T.text2, mr);

@@ -4,7 +4,7 @@
 
 Turns the monitor off after N minutes of inactivity and wakes it on mouse movement or a key press — like the built-in Windows display timeout, but more reliable. It only looks at **your** input, so browsers, game launchers, open video tabs or drivers can't keep the screen awake. The PC keeps working: downloads, music and torrents are not interrupted.
 
-Version 1.2.0 · Developer: **Sallador**
+Version 1.2.1 · Developer: **Sallador**
 
 <img src="../docs/noctis.png" width="360">
 
@@ -33,12 +33,12 @@ The screen wakes up as usual: move the mouse or press any key. Noctis switches t
 
 ## Install
 
-Run `Noctis_Setup_1.2.0.exe` from [Releases](../../../releases). No admin rights needed. It installs to `%LOCALAPPDATA%\Programs\Noctis`. Uninstall from *Settings → Apps*.
+Run `Noctis_Setup_1.2.1.exe` from [Releases](../../../releases). No admin rights needed. It installs to `%LOCALAPPDATA%\Programs\Noctis`. Uninstall from *Settings → Apps*.
 
 Silent install:
 
 ```
-Noctis_Setup_1.2.0.exe /S [/D=<folder>] [/nodesktop] [/noautostart] [/nolaunch]
+Noctis_Setup_1.2.1.exe /S [/D=<folder>] [/nodesktop] [/noautostart] [/nolaunch]
 uninstall.exe /uninstall /S
 ```
 
@@ -50,7 +50,7 @@ Command line: `Noctis.exe /off` turns the screen off now; `Noctis.exe /autostart
 
 ## Build
 
-Visual Studio 2022 (C++ workload) → run `build.bat`. It produces `bin\Noctis.exe` and `dist\Noctis_Setup_1.2.0.exe`.
+Visual Studio 2022 (C++ workload) → run `build.bat`. It produces `bin\Noctis.exe` and `dist\Noctis_Setup_1.2.1.exe`.
 
 Settings are stored in `HKCU\Software\Sallador\Noctis`.
 
@@ -64,7 +64,7 @@ Settings are stored in `HKCU\Software\Sallador\Noctis`.
 
 Выключает монитор после N минут вашего бездействия и включает его при движении мыши или нажатии клавиши. Работает как встроенный таймер Windows, но надёжнее: смотрит только на **ваш** ввод, поэтому браузеры, игровые клиенты, открытые вкладки с видео и драйверы не мешают экрану погаснуть. Компьютер при этом продолжает работать: загрузки, музыка и торренты не прерываются.
 
-Версия 1.2.0 · Разработчик: **Sallador**
+Версия 1.2.1 · Разработчик: **Sallador**
 
 ## Выключение экрана в любой момент
 
@@ -91,12 +91,12 @@ Noctis — не только таймер. Отошли от компьютер�
 
 ## Установка
 
-Запустите `Noctis_Setup_1.2.0.exe` из [Releases](../../../releases). Права администратора не нужны. Программа ставится в `%LOCALAPPDATA%\Programs\Noctis`. Удаление — «Параметры → Приложения».
+Запустите `Noctis_Setup_1.2.1.exe` из [Releases](../../../releases). Права администратора не нужны. Программа ставится в `%LOCALAPPDATA%\Programs\Noctis`. Удаление — «Параметры → Приложения».
 
 Тихая установка:
 
 ```
-Noctis_Setup_1.2.0.exe /S [/D=<папка>] [/nodesktop] [/noautostart] [/nolaunch]
+Noctis_Setup_1.2.1.exe /S [/D=<папка>] [/nodesktop] [/noautostart] [/nolaunch]
 uninstall.exe /uninstall /S
 ```
 
@@ -108,6 +108,6 @@ uninstall.exe /uninstall /S
 
 ## Сборка
 
-Visual Studio 2022 (компонент C++) → запустите `build.bat`. Получите `bin\Noctis.exe` и `dist\Noctis_Setup_1.2.0.exe`.
+Visual Studio 2022 (компонент C++) → запустите `build.bat`. Получите `bin\Noctis.exe` и `dist\Noctis_Setup_1.2.1.exe`.
 
 Настройки хранятся в `HKCU\Software\Sallador\Noctis`.
