@@ -1,4 +1,4 @@
-﻿// Cogitator Setup 2.1 — Windows 11 (Fluent) installer / uninstaller. Developer: Sallador.
+﻿// Cogitator Setup 2.2 — Windows 11 (Fluent) installer / uninstaller. Developer: Sallador.
 // Per-user install (no admin): %LOCALAPPDATA%\Programs\Cogitator
 //
 //   Setup.exe                                  interactive install
@@ -20,6 +20,7 @@
 #include <wchar.h>
 #include "resource.h"
 #include "fluent.h"
+#include "lang.h"
 
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "shell32.lib")
@@ -28,7 +29,7 @@
 
 #define APP_NAME     L"Cogitator"
 #define APP_EXE      L"Cogitator.exe"
-#define APP_VERSION  L"2.1.0"
+#define APP_VERSION  L"2.2.0"
 #define PUBLISHER    L"Sallador"
 #define APP_CLASS    L"CogitatorWidget"
 #define OLD_CLASS    L"Cogitator40kWidget"                 // v2.0
@@ -124,21 +125,21 @@ static BOOL DoInstall(WCHAR* err, int errN) {
     CloseApp();
     int rc = SHCreateDirectoryExW(NULL, g_dir, NULL);
     if (rc != ERROR_SUCCESS && rc != ERROR_ALREADY_EXISTS && rc != ERROR_FILE_EXISTS) {
-        swprintf_s(err, errN, L"Не удалось создать папку (код %d). Выберите другую папку.", rc); return FALSE;
+        swprintf_s(err, errN, TR(L"Не удалось создать папку (код %d). Выберите другую папку.", L"Could not create the folder (code %d). Choose another folder."), rc); return FALSE;
     }
     WCHAR exe[MAX_PATH], unin[MAX_PATH], self[MAX_PATH];
     JoinPath(exe, g_dir, APP_EXE);
     JoinPath(unin, g_dir, L"uninstall.exe");
-    if (!ExtractPayload(exe)) { swprintf_s(err, errN, L"Нет доступа к папке. Выберите другую папку."); return FALSE; }
+    if (!ExtractPayload(exe)) { swprintf_s(err, errN, TR(L"Нет доступа к папке. Выберите другую папку.", L"No access to the folder. Choose another folder.")); return FALSE; }
     GetModuleFileNameW(NULL, self, MAX_PATH);
     if (_wcsicmp(self, unin) != 0) CopyFileW(self, unin, FALSE);
 
     RegDelValue(REG_RUN, L"CyberMon");                     // old CyberMon autostart entry
     WCHAR lnk[MAX_PATH];
     KnownPath(FOLDERID_Programs, lnk, LNK_APP);
-    if (lnk[0]) MakeShortcut(lnk, exe, NULL, g_dir, L"Cogitator — монитор приложений (Sallador)");
+    if (lnk[0]) MakeShortcut(lnk, exe, NULL, g_dir, TR(L"Cogitator — монитор приложений (Sallador)", L"Cogitator — app monitor (Sallador)"));
     KnownPath(FOLDERID_Desktop, lnk, LNK_APP);
-    if (lnk[0]) { if (g_optDesk) MakeShortcut(lnk, exe, NULL, g_dir, L"Cogitator — монитор приложений (Sallador)"); else DeleteFileW(lnk); }
+    if (lnk[0]) { if (g_optDesk) MakeShortcut(lnk, exe, NULL, g_dir, TR(L"Cogitator — монитор приложений (Sallador)", L"Cogitator — app monitor (Sallador)")); else DeleteFileW(lnk); }
 
     HKEY k;
     if (RegOpenKeyExW(HKEY_CURRENT_USER, REG_RUN, 0, KEY_SET_VALUE, &k) == ERROR_SUCCESS) {
@@ -167,7 +168,7 @@ static BOOL DoInstall(WCHAR* err, int errN) {
 }
 
 static void DoUninstall(BOOL silent) {
-    if (!silent && MessageBoxW(NULL, L"Удалить Cogitator с этого компьютера?", L"Cogitator",
+    if (!silent && MessageBoxW(NULL, TR(L"Удалить Cogitator с этого компьютера?", L"Remove Cogitator from this computer?"), L"Cogitator",
                                MB_YESNO | MB_ICONQUESTION) != IDYES) return;
     WCHAR self[MAX_PATH], dir[MAX_PATH], path[MAX_PATH];
     GetModuleFileNameW(NULL, self, MAX_PATH);
@@ -190,7 +191,7 @@ static void DoUninstall(BOOL silent) {
     if (CreateProcessW(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, sysdir, &si, &pi)) {
         CloseHandle(pi.hThread); CloseHandle(pi.hProcess);
     }
-    if (!silent) MessageBoxW(NULL, L"Cogitator удалён.\n\nРазработчик: Sallador", L"Cogitator", MB_OK | MB_ICONINFORMATION);
+    if (!silent) MessageBoxW(NULL, TR(L"Cogitator удалён.\n\nРазработчик: Sallador", L"Cogitator has been removed.\n\nDeveloper: Sallador"), L"Cogitator", MB_OK | MB_ICONINFORMATION);
 }
 
 // ───────────────────────────── UI ────────────────────────────────────
@@ -220,7 +221,7 @@ static void PaintTo(Graphics& g) {
 
     // ── title bar
     DrawAppMark(g, D(12), D(8), D(16));
-    FText(g, L"Установка Cogitator", g_fCaption, T.text, RectF(D(40), 0, D(300), D(TITLE_H)));
+    FText(g, TR(L"Установка Cogitator", L"Cogitator Setup"), g_fCaption, T.text, RectF(D(40), 0, D(300), D(TITLE_H)));
     RectF rm = RF(g_rc[H_MIN]), rx = RF(g_rc[H_CLOSEX]);
     if (Hv(H_MIN)) FFillRect(g, rm.X, rm.Y, rm.Width, rm.Height, Pr(H_MIN) ? T.subtlePress : T.subtleHover);
     FGlyph(g, GL_MINIMIZE, D(10), T.text, rm);
@@ -231,18 +232,18 @@ static void PaintTo(Graphics& g) {
     // ── hero
     DrawAppMark(g, D(24), D(52), D(56));
     FText(g, L"Cogitator", g_fSubtitle, T.text, RectF(D(96), D(50), D(380), D(30)));
-    FText(g, L"Монитор приложений для рабочего стола", g_fBody, T.text2, RectF(D(96), D(80), D(380), D(22)));
-    FText(g, L"Версия " APP_VERSION L"  ·  Разработчик: Sallador", g_fCaption, T.text3, RectF(D(96), D(102), D(380), D(20)));
+    FText(g, TR(L"Монитор приложений для рабочего стола", L"Desktop app monitor"), g_fBody, T.text2, RectF(D(96), D(80), D(380), D(22)));
+    FText(g, TR(L"Версия " APP_VERSION L"  ·  Разработчик: Sallador", L"Version " APP_VERSION L"  ·  Developer: Sallador"), g_fCaption, T.text3, RectF(D(96), D(102), D(380), D(20)));
 
     if (g_state == 0) {
-        FText(g, L"Папка установки", g_fStrong, T.text, RectF(D(24), D(138), D(300), D(24)));
+        FText(g, TR(L"Папка установки", L"Install folder"), g_fStrong, T.text, RectF(D(24), D(138), D(300), D(24)));
         RectF tb(D(24), D(166), D(W - 24 - 110 - 8 - 24), D(32));
         FillRR(g, tb, D(4), T.ctrl);
         StrokeRR(g, tb, D(4), T.ctrlStroke);
         FText(g, g_dir, g_fBody, T.text, RectF(tb.X + D(12), tb.Y, tb.Width - D(24), tb.Height), AL_LEFT, StringTrimmingEllipsisPath);
-        FButton(g, RF(g_rc[H_BROWSE]), L"Обзор…", FALSE, Hv(H_BROWSE), Pr(H_BROWSE), GL_FOLDER);
+        FButton(g, RF(g_rc[H_BROWSE]), TR(L"Обзор…", L"Browse…"), FALSE, Hv(H_BROWSE), Pr(H_BROWSE), GL_FOLDER);
 
-        const WCHAR* labels[3] = { L"Ярлык на рабочем столе", L"Запускать вместе с Windows", L"Запустить после установки" };
+        const WCHAR* labels[3] = { TR(L"Ярлык на рабочем столе", L"Desktop shortcut"), TR(L"Запускать вместе с Windows", L"Start with Windows"), TR(L"Запустить после установки", L"Launch after install") };
         BOOL vals[3] = { g_optDesk, g_optAuto, g_optLaunch };
         for (int i = 0; i < 3; i++) {
             RectF r = RF(g_rc[H_DESK + i]);
@@ -257,14 +258,14 @@ static void PaintTo(Graphics& g) {
         StrokeRR(g, ib, D(4), T.cardStroke);
         FillCircle(g, ib.X + D(24), ib.Y + D(22), D(8), T.success);
         FGlyph(g, GL_CHECK, D(10), T.onAccent, RectF(ib.X + D(16), ib.Y + D(14), D(16), D(16)));
-        FText(g, L"Установка завершена", g_fStrong, T.text, RectF(ib.X + D(44), ib.Y + D(10), ib.Width - D(56), D(24)));
+        FText(g, TR(L"Установка завершена", L"Installation complete"), g_fStrong, T.text, RectF(ib.X + D(44), ib.Y + D(10), ib.Width - D(56), D(24)));
         FText(g, g_dir, g_fBody, T.text2, RectF(ib.X + D(44), ib.Y + D(32), ib.Width - D(56), D(24)), AL_LEFT, StringTrimmingEllipsisPath);
 
         static const WCHAR glyphs[3] = { GL_PLAY, GL_MORE, GL_SETTINGS };
         static const WCHAR* hints[3] = {
-            L"Виджет появится в правом верхнем углу экрана",
-            L"Перетаскивайте его мышью; меню — правый клик или «…»",
-            L"Удалить можно в Параметрах → Приложения" };
+            TR(L"Виджет появится в правом верхнем углу экрана", L"The widget appears in the top-right corner"),
+            TR(L"Перетаскивайте его мышью; меню — правый клик или «…»", L"Drag it with the mouse; right-click or \"…\" for the menu"),
+            TR(L"Удалить можно в Параметрах → Приложения", L"Uninstall from Settings → Apps") };
         for (int i = 0; i < 3; i++) {
             REAL y = D(224 + 32 * i);
             FGlyph(g, glyphs[i], D(16), T.text2, RectF(D(24), y, D(20), D(24)));
@@ -277,8 +278,8 @@ static void PaintTo(Graphics& g) {
     FFillRect(g, 0, fy, (REAL)g_w, (REAL)g_h - fy, T.footer);
     FFillRect(g, 0, fy, (REAL)g_w, 1.0f, T.divider);
     FText(g, L"© 2026 Sallador", g_fCaption, T.text3, RectF(D(24), fy, D(200), D(FOOTER_H)));
-    if (g_state == 0) FButton(g, RF(g_rc[H_CANCEL]), L"Отмена", FALSE, Hv(H_CANCEL), Pr(H_CANCEL));
-    FButton(g, RF(g_rc[H_INSTALL]), g_state == 1 ? L"Готово" : L"Установить", TRUE, Hv(H_INSTALL), Pr(H_INSTALL));
+    if (g_state == 0) FButton(g, RF(g_rc[H_CANCEL]), TR(L"Отмена", L"Cancel"), FALSE, Hv(H_CANCEL), Pr(H_CANCEL));
+    FButton(g, RF(g_rc[H_INSTALL]), g_state == 1 ? TR(L"Готово", L"Done") : TR(L"Установить", L"Install"), TRUE, Hv(H_INSTALL), Pr(H_INSTALL));
 }
 
 static void Paint(HDC hdc) {
@@ -298,7 +299,7 @@ static void Browse() {
     if (FAILED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&d)))) return;
     DWORD o = 0; d->GetOptions(&o);
     d->SetOptions(o | FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM);
-    d->SetTitle(L"Папка установки Cogitator");
+    d->SetTitle(TR(L"Папка установки Cogitator", L"Cogitator install folder"));
     if (SUCCEEDED(d->Show(g_hwnd))) {
         IShellItem* it = NULL;
         if (SUCCEEDED(d->GetResult(&it))) {
@@ -326,7 +327,7 @@ static void OnClick(int id) {
     case H_CANCEL: DestroyWindow(g_hwnd); return;
     case H_INSTALL:
         if (g_state == 1) { DestroyWindow(g_hwnd); return; }
-        wcscpy_s(g_status, L"Установка…"); g_statusKind = SS_INFO;
+        wcscpy_s(g_status, TR(L"Установка…", L"Installing…")); g_statusKind = SS_INFO;
         InvalidateRect(g_hwnd, NULL, FALSE); UpdateWindow(g_hwnd);
         {
             WCHAR err[256] = L"";
@@ -402,6 +403,7 @@ static LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM w, LPARAM l) {
 
 int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, int) {
     g_hInst = hInst;
+    InitLang(REG_APP);
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
     CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 
@@ -441,8 +443,8 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, int) {
     wc.hIcon = big; wc.hIconSm = sm; wc.lpszClassName = L"CogitatorSetup";
     RegisterClassExW(&wc);
 
-    wcscpy_s(g_status, L"Права администратора не требуются — установка в профиль пользователя.");
-    HWND h = CreateWindowExW(WS_EX_APPWINDOW, wc.lpszClassName, L"Установка Cogitator",
+    wcscpy_s(g_status, TR(L"Права администратора не требуются — установка в профиль пользователя.", L"No administrator rights needed — installs for the current user."));
+    HWND h = CreateWindowExW(WS_EX_APPWINDOW, wc.lpszClassName, TR(L"Установка Cogitator", L"Cogitator Setup"),
                              WS_POPUP | WS_THICKFRAME | WS_MINIMIZEBOX,
                              0, 0, BASE_W, BASE_H, NULL, NULL, hInst, NULL);
     if (!h) return 1;

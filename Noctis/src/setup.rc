@@ -5,5 +5,5 @@ IDI_APP ICON "noctis.ico"
 IDR_PAYLOAD RCDATA "..\\bin\\Noctis.exe"
 
 #define VER_DESC "Noctis Setup (by Sallador)"
-#define VER_ORIGNAME "Noctis_Setup_1.1.0.exe"
+#define VER_ORIGNAME "Noctis_Setup_1.2.0.exe"
 #include "version.rc2"

@@ -27,8 +27,8 @@ rem ---- 2. installer (embeds bin\Mensura.exe)
 pushd src
 rc /nologo /fo ..\build\setup.res setup.rc || (popd & exit /b 1)
 popd
-cl %CFLAGS% /Fobuild\ src\setup.cpp build\setup.res /Fedist\Mensura_Setup_1.0.0.exe /link %LFLAGS% || exit /b 1
+cl %CFLAGS% /Fobuild\ src\setup.cpp build\setup.res /Fedist\Mensura_Setup_1.1.0.exe /link %LFLAGS% || exit /b 1
 
 echo.
 echo [OK] bin\Mensura.exe
-echo [OK] dist\Mensura_Setup_1.0.0.exe
+echo [OK] dist\Mensura_Setup_1.1.0.exe

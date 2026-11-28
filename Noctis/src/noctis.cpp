@@ -1,4 +1,4 @@
-// Noctis 1.1 — turns the monitor off after N minutes of user inactivity (like Windows' own
+﻿// Noctis 1.2 — turns the monitor off after N minutes of user inactivity (like Windows' own
 // display timeout, but ignoring apps that keep the screen awake). Wakes on mouse / keyboard.
 // Windows 11 (Fluent) edition. Developer: Sallador.  Pure Win32 + GDI+, static CRT.
 //
@@ -19,6 +19,7 @@
 #include <wchar.h>
 #include "resource.h"
 #include "fluent.h"
+#include "lang.h"
 
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "shell32.lib")
@@ -151,16 +152,16 @@ static void StartManualOff() {
 }
 
 static int StatusText(WCHAR* s, int n) {
-    if (!g_enabled) { wcscpy_s(s, n, L"Автовыключение отключено"); return ST_MUTED; }
+    if (!g_enabled) { wcscpy_s(s, n, TR(L"Автовыключение отключено", L"Auto turn-off is disabled")); return ST_MUTED; }
     if (Paused()) {
         ULONGLONG left = (g_pauseUntil - GetTickCount64()) / 60000 + 1;
-        swprintf_s(s, n, L"Пауза ещё %llu мин", left); return ST_MUTED;
+        swprintf_s(s, n, TR(L"Пауза ещё %llu мин", L"Paused for %llu more min"), left); return ST_MUTED;
     }
-    if (g_offActive) { wcscpy_s(s, n, L"Экран выключен"); return ST_OK; }
+    if (g_offActive) { wcscpy_s(s, n, TR(L"Экран выключен", L"Screen is off")); return ST_OK; }
     DWORD idle = IdleMs(), lim = (DWORD)g_timeoutMin * 60000u;
-    if (idle >= lim && g_skipFs && FullscreenBusy()) { wcscpy_s(s, n, L"Ожидание: игра или видео"); return ST_MUTED; }
+    if (idle >= lim && g_skipFs && FullscreenBusy()) { wcscpy_s(s, n, TR(L"Ожидание: игра или видео", L"Waiting: game or video")); return ST_MUTED; }
     DWORD left = idle >= lim ? 0 : (lim - idle + 999) / 1000;
-    swprintf_s(s, n, L"Выключение через %u:%02u", left / 60, left % 60);
+    swprintf_s(s, n, TR(L"Выключение через %u:%02u", L"Turning off in %u:%02u"), left / 60, left % 60);
     return ST_NORMAL;
 }
 
@@ -216,30 +217,31 @@ static void TogglePause() {
 
 static void ShowMenu(POINT pt) {
     HMENU m = CreatePopupMenu();
-    AppendMenuW(m, MF_STRING, ID_OFF, g_hotkeyOk ? L"Выключить экран сейчас\tCtrl+Alt+M" : L"Выключить экран сейчас");
+    AppendMenuW(m, MF_STRING, ID_OFF, g_hotkeyOk ? TR(L"Выключить экран сейчас\tCtrl+Alt+M", L"Turn off screen now\tCtrl+Alt+M") : TR(L"Выключить экран сейчас", L"Turn off screen now"));
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
     HMENU tm = CreatePopupMenu();
     BOOL preset = FALSE;
     for (int i = 0; i < 6; i++) {
-        WCHAR t[32]; swprintf_s(t, L"%d мин", kPresets[i]);
+        WCHAR t[32]; swprintf_s(t, TR(L"%d мин", L"%d min"), kPresets[i]);
         if (kPresets[i] == g_timeoutMin) preset = TRUE;
         AppendMenuW(tm, MF_STRING | (kPresets[i] == g_timeoutMin ? MF_CHECKED : 0), ID_TIME_BASE + i, t);
     }
     WCHAR ct[48];
-    if (preset) wcscpy_s(ct, L"Другое…"); else swprintf_s(ct, L"Другое: %d мин…", g_timeoutMin);
+    if (preset) wcscpy_s(ct, TR(L"Другое…", L"Custom…")); else swprintf_s(ct, TR(L"Другое: %d мин…", L"Custom: %d min…"), g_timeoutMin);
     AppendMenuW(tm, MF_STRING | (preset ? 0 : MF_CHECKED), ID_TIME_CUSTOM, ct);
-    AppendMenuW(m, MF_POPUP, (UINT_PTR)tm, L"Выключать экран через");
-    AppendMenuW(m, MF_STRING | (g_enabled ? MF_CHECKED : 0), ID_ENABLED, L"Автоматическое выключение");
-    AppendMenuW(m, MF_STRING | (g_skipFs ? MF_CHECKED : 0), ID_SKIPFS, L"Не выключать в играх и видео");
+    AppendMenuW(m, MF_POPUP, (UINT_PTR)tm, TR(L"Выключать экран через", L"Turn off screen after"));
+    AppendMenuW(m, MF_STRING | (g_enabled ? MF_CHECKED : 0), ID_ENABLED, TR(L"Автоматическое выключение", L"Automatic turn-off"));
+    AppendMenuW(m, MF_STRING | (g_skipFs ? MF_CHECKED : 0), ID_SKIPFS, TR(L"Не выключать в играх и видео", L"Not during games and videos"));
     WCHAR pt2[64];
-    if (Paused()) swprintf_s(pt2, L"Снять паузу (ещё %llu мин)", (g_pauseUntil - GetTickCount64()) / 60000 + 1);
-    else wcscpy_s(pt2, L"Пауза на 1 час");
+    if (Paused()) swprintf_s(pt2, TR(L"Снять паузу (ещё %llu мин)", L"Resume (%llu min left)"), (g_pauseUntil - GetTickCount64()) / 60000 + 1);
+    else wcscpy_s(pt2, TR(L"Пауза на 1 час", L"Pause for 1 hour"));
     AppendMenuW(m, MF_STRING, ID_PAUSE, pt2);
-    AppendMenuW(m, MF_STRING | (IsAutostart() ? MF_CHECKED : 0), ID_AUTOSTART, L"Запускать вместе с Windows");
+    AppendMenuW(m, MF_STRING | (IsAutostart() ? MF_CHECKED : 0), ID_AUTOSTART, TR(L"Запускать вместе с Windows", L"Start with Windows"));
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
-    AppendMenuW(m, MF_STRING, ID_SETTINGS, L"Параметры");
-    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, L"Noctis 1.1 · разработчик Sallador");
-    AppendMenuW(m, MF_STRING, ID_EXIT, L"Выход");
+    AppendMenuW(m, MF_STRING, ID_SETTINGS, TR(L"Параметры", L"Settings"));
+    AppendLangMenu(m, REG_KEY);
+    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, TR(L"Noctis 1.2 · разработчик Sallador", L"Noctis 1.2 · by Sallador"));
+    AppendMenuW(m, MF_STRING, ID_EXIT, TR(L"Выход", L"Exit"));
     SetForegroundWindow(g_hwnd);
     TrackPopupMenu(m, TPM_RIGHTBUTTON, pt.x, pt.y, 0, g_hwnd, NULL);
     PostMessageW(g_hwnd, WM_NULL, 0, 0);
@@ -287,10 +289,10 @@ static void PaintTo(Graphics& g) {
     FText(g, buf, g_fSubtitle, st == ST_OK ? T.success : st == ST_MUTED ? T.text2 : T.text,
           RectF(D(28), D(60), D(W - 56), D(30)), AL_LEFT, StringTrimmingEllipsisCharacter);
     DWORD idle = IdleMs() / 1000;
-    swprintf_s(buf, L"Бездействие %u:%02u", idle / 60, idle % 60);
+    swprintf_s(buf, TR(L"Бездействие %u:%02u", L"Idle %u:%02u"), idle / 60, idle % 60);
     FText(g, buf, g_fBody, T.text2, RectF(D(28), D(92), D(170), D(22)));
-    if (g_haveLastOff) swprintf_s(buf, L"Выключался в %02u:%02u", g_lastOff.wHour, g_lastOff.wMinute);
-    else wcscpy_s(buf, L"Ещё не выключался");
+    if (g_haveLastOff) swprintf_s(buf, TR(L"Выключался в %02u:%02u", L"Last turned off at %02u:%02u"), g_lastOff.wHour, g_lastOff.wMinute);
+    else wcscpy_s(buf, TR(L"Ещё не выключался", L"Not turned off yet"));
     FText(g, buf, g_fCaption, T.text3, RectF(D(150), D(92), D(W - 178), D(22)), AL_RIGHT);
     REAL frac = 0;
     if (g_offActive) frac = 1;
@@ -298,11 +300,11 @@ static void PaintTo(Graphics& g) {
     FProgress(g, D(28), D(126), D(W - 56), frac, st == ST_MUTED ? T.text3 : st == ST_OK ? T.success : T.accent);
 
     // ── timeout
-    FText(g, L"Выключать экран через", g_fStrong, T.text, RectF(D(16), D(156), D(W - 32), D(24)));
+    FText(g, TR(L"Выключать экран через", L"Turn off screen after"), g_fStrong, T.text, RectF(D(16), D(156), D(W - 32), D(24)));
     for (int i = 0; i < 6; i++) {
         int id = H_CHIP0 + i;
         RectF r = RF(g_rc[id]);
-        swprintf_s(buf, L"%d мин", kPresets[i]);
+        swprintf_s(buf, TR(L"%d мин", L"%d min"), kPresets[i]);
         if (kPresets[i] == g_timeoutMin) {
             FillRR(g, r, D(4), Pr(id) ? T.accentPress : Hv(id) ? T.accentHover : T.accent);
             FText(g, buf, g_fBody, T.onAccent, r, AL_CENTER);
@@ -312,7 +314,7 @@ static void PaintTo(Graphics& g) {
             FText(g, buf, g_fBody, Pr(id) ? T.text2 : T.text, r, AL_CENTER);
         }
     }
-    FText(g, L"Своё значение", g_fBody, T.text2, RectF(D(16), D(228), D(150), D(32)));
+    FText(g, TR(L"Своё значение", L"Custom value"), g_fBody, T.text2, RectF(D(16), D(228), D(150), D(32)));
     RectF box(D(W - 162), D(228), D(150), D(32));
     FillRR(g, box, D(4), T.ctrl);
     StrokeRR(g, box, D(4), T.ctrlStroke);
@@ -322,13 +324,13 @@ static void PaintTo(Graphics& g) {
         if (Hv(id)) FillRR(g, RectF(b.X + D(4), b.Y + D(4), b.Width - D(8), b.Height - D(8)), D(3), Pr(id) ? T.subtlePress : T.subtleHover);
         FGlyph(g, k ? GL_ADD : GL_REMOVE, D(12), T.text2, b);
     }
-    swprintf_s(buf, L"%d мин", g_timeoutMin);
+    swprintf_s(buf, TR(L"%d мин", L"%d min"), g_timeoutMin);
     FText(g, buf, g_fBody, T.text, RectF(box.X + D(36), box.Y, box.Width - D(72), box.Height), AL_CENTER);
 
     // ── settings group
     FCard(g, RectF(D(12), D(272), D(W - 24), D(192)));
-    static const WCHAR* titles[4] = { L"Автоматическое выключение", L"Не выключать в играх и видео",
-                                      L"Запускать вместе с Windows", L"Выключить сейчас" };
+    static const WCHAR* titles[4] = { TR(L"Автоматическое выключение", L"Automatic turn-off"), TR(L"Не выключать в играх и видео", L"Not during games and videos"),
+                                      TR(L"Запускать вместе с Windows", L"Start with Windows"), TR(L"Выключить сейчас", L"Turn off now") };
     static const WCHAR glyphs[4] = { GL_POWER, GL_GAME, GL_PLAY, GL_KEYBOARD };
     BOOL vals[3] = { g_enabled, g_skipFs, IsAutostart() };
     for (int i = 0; i < 4; i++) {
@@ -347,7 +349,7 @@ static void PaintTo(Graphics& g) {
                 x = FKeycap(g, x - D(4), y + D(12), L"Alt");
                 FKeycap(g, x - D(4), y + D(12), L"Ctrl");
             } else {
-                FText(g, L"Ctrl+Alt+M занято", g_fBody, T.caution, RectF(D(W - 200), y, D(172), D(48)), AL_RIGHT);
+                FText(g, TR(L"Ctrl+Alt+M занято", L"Ctrl+Alt+M is taken"), g_fBody, T.caution, RectF(D(W - 200), y, D(172), D(48)), AL_RIGHT);
             }
         }
     }
@@ -356,9 +358,9 @@ static void PaintTo(Graphics& g) {
     REAL fy = D(480);
     FFillRect(g, 0, fy, (REAL)g_w, (REAL)g_h - fy, T.footer);
     FFillRect(g, 0, fy, (REAL)g_w, 1.0f, T.divider);
-    FButton(g, RF(g_rc[H_PAUSE]), Paused() ? L"Снять паузу" : L"Пауза на 1 час", FALSE,
+    FButton(g, RF(g_rc[H_PAUSE]), Paused() ? TR(L"Снять паузу", L"Resume") : TR(L"Пауза на 1 час", L"Pause for 1 hour"), FALSE,
             Hv(H_PAUSE), Pr(H_PAUSE), Paused() ? GL_PLAY : GL_PAUSE);
-    FButton(g, RF(g_rc[H_OFF]), L"Выключить экран", TRUE, Hv(H_OFF), Pr(H_OFF), GL_POWER);
+    FButton(g, RF(g_rc[H_OFF]), TR(L"Выключить экран", L"Turn off screen"), TRUE, Hv(H_OFF), Pr(H_OFF), GL_POWER);
 }
 
 static void Paint(HDC hdc) {
@@ -518,6 +520,7 @@ static LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM w, LPARAM l) {
 
     case WM_COMMAND: {
         int id = LOWORD(w);
+        if (id >= ID_LANG_AUTO && id <= ID_LANG_EN) { RestartForLang(REG_KEY, id - ID_LANG_AUTO, NULL); DestroyWindow(h); return 0; }
         if (id >= ID_TIME_BASE && id < ID_TIME_BASE + 6) SetTimeoutMin(kPresets[id - ID_TIME_BASE]);
         else if (id == ID_TIME_CUSTOM || id == ID_SETTINGS) ShowFlyout();
         else if (id == ID_OFF)       StartManualOff();
@@ -550,6 +553,7 @@ static LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM w, LPARAM l) {
 
 int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, int) {
     g_hInst = hInst;
+    InitLang(REG_KEY);
     BOOL argOff = FALSE, argAuto = FALSE;
     int argc = 0; LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
     for (int i = 1; argv && i < argc; i++) {
@@ -558,7 +562,7 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, int) {
     }
     if (argv) LocalFree(argv);
 
-    CreateMutexW(NULL, TRUE, L"Local\\Noctis_Sallador_SingleInstance");
+    g_mutexLang = CreateMutexW(NULL, TRUE, L"Local\\Noctis_Sallador_SingleInstance");
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
         HWND w = FindWindowW(CLASS_NAME, NULL);
         if (w) { AllowSetForegroundWindow(ASFW_ANY); PostMessageW(w, argOff ? WM_APP_OFF : WM_APP_SHOW, 0, 0); }

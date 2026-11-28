@@ -1,4 +1,4 @@
-// Cogitator 2.1 — desktop widget: top-10 applications by CPU / GPU / RAM.
+﻿// Cogitator 2.2 — desktop widget: top-10 applications by CPU / GPU / RAM.
 // Windows 11 (Fluent) edition. Developer: Sallador.  Pure Win32 + GDI+, static CRT.
 
 #define _WIN32_WINNT 0x0A00
@@ -19,6 +19,7 @@
 #include <wchar.h>
 #include "resource.h"
 #include "fluent.h"
+#include "lang.h"
 
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "shell32.lib")
@@ -427,7 +428,7 @@ static void Sample() {
 }
 
 // ───────────────────────────── rendering ─────────────────────────────
-static void Comma(WCHAR* s) { for (; *s; s++) if (*s == L'.') *s = L','; }
+static void Comma(WCHAR* s) { if (g_en) return; for (; *s; s++) if (*s == L'.') *s = L','; }
 static void FmtPct(WCHAR* b, int n, double v) {
     if (v < 0) wcscpy_s(b, n, L"—");
     else if (v < 9.95) swprintf_s(b, n, L"%.1f%%", v);
@@ -436,8 +437,8 @@ static void FmtPct(WCHAR* b, int n, double v) {
 }
 static void FmtMem(WCHAR* b, int n, ULONGLONG bytes) {
     double mb = bytes / 1048576.0;
-    if (mb >= 1024) swprintf_s(b, n, L"%.1f ГБ", mb / 1024.0);
-    else swprintf_s(b, n, L"%.0f МБ", mb);
+    if (mb >= 1024) swprintf_s(b, n, TR(L"%.1f ГБ", L"%.1f GB"), mb / 1024.0);
+    else swprintf_s(b, n, TR(L"%.0f МБ", L"%.0f MB"), mb);
     Comma(b);
 }
 // value columns: x and width (DIPs)
@@ -469,13 +470,13 @@ static void PaintTo(Graphics& g) {
     FText(g, L"Cogitator", g_fStrong, T.text, RectF(D(38), 0, D(120), D(HDR_H)));
     REAL tw = FTextW(g, L"Cogitator", g_fStrong);
     FText(g, L"·  Sallador", g_fCaption, T.text3, RectF(D(38) + tw + D(8), 0, D(120), D(HDR_H)));
-    FText(g, g_showAll ? L"Все процессы" : L"Приложения", g_fCaption, T.text3, RectF(D(W - 170), 0, D(124), D(HDR_H)), AL_RIGHT);
+    FText(g, g_showAll ? TR(L"Все процессы", L"All processes") : TR(L"Приложения", L"Apps"), g_fCaption, T.text3, RectF(D(W - 170), 0, D(124), D(HDR_H)), AL_RIGHT);
     RectF mr = RF(g_rc[H_MORE]);
     if (Hv(H_MORE)) FillRR(g, mr, D(4), Pr(H_MORE) ? T.subtlePress : T.subtleHover);
     FGlyph(g, GL_MORE, D(14), T.text2, mr);
 
     // ── summary tiles
-    static const WCHAR* lbl[3] = { L"ЦП", L"ГП", L"Память" };
+    static const WCHAR* lbl[3] = { TR(L"ЦП", L"CPU"), TR(L"ГП", L"GPU"), TR(L"Память", L"Memory") };
     double vals[3] = { g_cpuTotal, g_gpuTotal, g_ramTotal ? g_ramUsed * 100.0 / (double)g_ramTotal : 0 };
     int tileW = (W - 24 - 16) / 3;
     for (int i = 0; i < 3; i++) {
@@ -484,7 +485,7 @@ static void PaintTo(Graphics& g) {
         double v = vals[i];
         BOOL hot = v >= 85;
         FText(g, lbl[i], g_fCaption, T.text2, RectF(D(x + 12), D(TILE_Y + 8), D(tileW - 24), D(18)));
-        if (i == 2) { swprintf_s(buf, L"%.1f ГБ", g_ramUsed / 1073741824.0); Comma(buf); }
+        if (i == 2) { swprintf_s(buf, TR(L"%.1f ГБ", L"%.1f GB"), g_ramUsed / 1073741824.0); Comma(buf); }
         else if (v < 0) wcscpy_s(buf, L"—");
         else swprintf_s(buf, L"%.0f%%", v);
         FText(g, buf, g_fSubtitle, hot ? T.critical : T.text, RectF(D(x + 12), D(TILE_Y + 26), D(tileW - 24), D(28)));
@@ -492,8 +493,8 @@ static void PaintTo(Graphics& g) {
     }
 
     // ── column header
-    FText(g, g_showAll ? L"Процесс" : L"Имя", g_fCaption, T.text2, RectF(D(20), D(TH_Y), D(150), D(TH_H)));
-    static const WCHAR* hdr[3] = { L"ЦП", L"ГП", L"Память" };
+    FText(g, g_showAll ? TR(L"Процесс", L"Process") : TR(L"Имя", L"Name"), g_fCaption, T.text2, RectF(D(20), D(TH_Y), D(150), D(TH_H)));
+    static const WCHAR* hdr[3] = { TR(L"ЦП", L"CPU"), TR(L"ГП", L"GPU"), TR(L"Память", L"Memory") };
     for (int c = 0; c < 3; c++) {
         int id = H_COL0 + c, x, w; ColDip(c, &x, &w);
         if (Hv(id)) FillRR(g, RF(g_rc[id]), D(4), Pr(id) ? T.subtlePress : T.subtleHover);
@@ -536,15 +537,15 @@ static void PaintTo(Graphics& g) {
         }
     }
     if (g_topN == 0)
-        FText(g, L"Нет открытых приложений", g_fBody, T.text3, RectF(0, D(ROW_Y), D(W), D(ROW_H * 2)), AL_CENTER);
+        FText(g, TR(L"Нет открытых приложений", L"No open apps"), g_fBody, T.text3, RectF(0, D(ROW_Y), D(W), D(ROW_H * 2)), AL_CENTER);
 
     // ── footer
     FFillRect(g, D(12), D(FOOT_Y), D(W - 24), 1.0f, T.divider);
     ULONGLONG up = GetTickCount64() / 1000;
     unsigned d = (unsigned)(up / 86400), hr = (unsigned)(up / 3600 % 24), mi = (unsigned)(up / 60 % 60), se = (unsigned)(up % 60);
     WCHAR ups[32];
-    if (d) swprintf_s(ups, L"%u д %02u:%02u", d, hr, mi); else swprintf_s(ups, L"%02u:%02u:%02u", hr, mi, se);
-    swprintf_s(buf, L"Приложений %d  ·  Процессов %d  ·  Работает %s", g_appCount, g_procs, ups);
+    if (d) swprintf_s(ups, TR(L"%u д %02u:%02u", L"%u d %02u:%02u"), d, hr, mi); else swprintf_s(ups, L"%02u:%02u:%02u", hr, mi, se);
+    swprintf_s(buf, TR(L"Приложений %d  ·  Процессов %d  ·  Работает %s", L"Apps %d  ·  Processes %d  ·  Uptime %s"), g_appCount, g_procs, ups);
     FText(g, buf, g_fCaption, T.text3, RectF(D(20), D(FOOT_Y + 1), D(W - 40), D(BASE_H - FOOT_Y - 1)), AL_LEFT, StringTrimmingEllipsisCharacter);
 }
 
@@ -586,8 +587,8 @@ static void TrayAdd() {
 }
 static void TrayTip() {
     double ram = g_ramTotal ? g_ramUsed * 100.0 / (double)g_ramTotal : 0;
-    if (g_gpuOk) swprintf_s(g_nid.szTip, L"Cogitator\nЦП %.0f%%   ГП %.0f%%   Память %.0f%%", g_cpuTotal, g_gpuTotal, ram);
-    else         swprintf_s(g_nid.szTip, L"Cogitator\nЦП %.0f%%   Память %.0f%%", g_cpuTotal, ram);
+    if (g_gpuOk) swprintf_s(g_nid.szTip, TR(L"Cogitator\nЦП %.0f%%   ГП %.0f%%   Память %.0f%%", L"Cogitator\nCPU %.0f%%   GPU %.0f%%   Memory %.0f%%"), g_cpuTotal, g_gpuTotal, ram);
+    else         swprintf_s(g_nid.szTip, TR(L"Cogitator\nЦП %.0f%%   Память %.0f%%", L"Cogitator\nCPU %.0f%%   Memory %.0f%%"), g_cpuTotal, ram);
     g_nid.uFlags = NIF_TIP;
     Shell_NotifyIconW(NIM_MODIFY, &g_nid);
 }
@@ -614,18 +615,19 @@ static void SetVisible(BOOL v) {
 }
 static void ShowMenu(POINT pt) {
     HMENU m = CreatePopupMenu();
-    AppendMenuW(m, MF_STRING | (g_sort == SORT_CPU ? MF_CHECKED : 0), ID_SORT_CPU, L"Сортировать по ЦП");
-    AppendMenuW(m, MF_STRING | (g_sort == SORT_GPU ? MF_CHECKED : 0), ID_SORT_GPU, L"Сортировать по ГП");
-    AppendMenuW(m, MF_STRING | (g_sort == SORT_RAM ? MF_CHECKED : 0), ID_SORT_RAM, L"Сортировать по памяти");
+    AppendMenuW(m, MF_STRING | (g_sort == SORT_CPU ? MF_CHECKED : 0), ID_SORT_CPU, TR(L"Сортировать по ЦП", L"Sort by CPU"));
+    AppendMenuW(m, MF_STRING | (g_sort == SORT_GPU ? MF_CHECKED : 0), ID_SORT_GPU, TR(L"Сортировать по ГП", L"Sort by GPU"));
+    AppendMenuW(m, MF_STRING | (g_sort == SORT_RAM ? MF_CHECKED : 0), ID_SORT_RAM, TR(L"Сортировать по памяти", L"Sort by memory"));
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
-    AppendMenuW(m, MF_STRING | (g_showAll ? MF_CHECKED : 0), ID_SHOWALL, L"Показывать фоновые процессы");
-    AppendMenuW(m, MF_STRING | (g_acrylic ? MF_CHECKED : 0), ID_ACRYLIC, L"Прозрачный фон");
-    AppendMenuW(m, MF_STRING | (g_topmost ? MF_CHECKED : 0), ID_TOPMOST, L"Поверх всех окон");
-    AppendMenuW(m, MF_STRING | (IsAutostart() ? MF_CHECKED : 0), ID_AUTOSTART, L"Запускать вместе с Windows");
+    AppendMenuW(m, MF_STRING | (g_showAll ? MF_CHECKED : 0), ID_SHOWALL, TR(L"Показывать фоновые процессы", L"Show background processes"));
+    AppendMenuW(m, MF_STRING | (g_acrylic ? MF_CHECKED : 0), ID_ACRYLIC, TR(L"Прозрачный фон", L"Transparent background"));
+    AppendMenuW(m, MF_STRING | (g_topmost ? MF_CHECKED : 0), ID_TOPMOST, TR(L"Поверх всех окон", L"Always on top"));
+    AppendMenuW(m, MF_STRING | (IsAutostart() ? MF_CHECKED : 0), ID_AUTOSTART, TR(L"Запускать вместе с Windows", L"Start with Windows"));
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
-    AppendMenuW(m, MF_STRING, ID_SHOWHIDE, g_visible ? L"Скрыть виджет" : L"Показать виджет");
-    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, L"Cogitator 2.1 · разработчик Sallador");
-    AppendMenuW(m, MF_STRING, ID_EXIT, L"Выход");
+    AppendMenuW(m, MF_STRING, ID_SHOWHIDE, g_visible ? TR(L"Скрыть виджет", L"Hide widget") : TR(L"Показать виджет", L"Show widget"));
+    AppendLangMenu(m, REG_KEY);
+    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, TR(L"Cogitator 2.2 · разработчик Sallador", L"Cogitator 2.2 · by Sallador"));
+    AppendMenuW(m, MF_STRING, ID_EXIT, TR(L"Выход", L"Exit"));
     SetForegroundWindow(g_hwnd);
     TrackPopupMenu(m, TPM_RIGHTBUTTON, pt.x, pt.y, 0, g_hwnd, NULL);
     PostMessageW(g_hwnd, WM_NULL, 0, 0);
@@ -744,6 +746,7 @@ static LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM w, LPARAM l) {
         return 0;
     case WM_COMMAND: {
         int id = LOWORD(w);
+        if (id >= ID_LANG_AUTO && id <= ID_LANG_EN) { RestartForLang(REG_KEY, id - ID_LANG_AUTO, NULL); g_exiting = TRUE; DestroyWindow(h); return 0; }
         if (id >= ID_SORT_CPU && id <= ID_SORT_RAM) SetSort(id - ID_SORT_CPU);
         else if (id == ID_TOPMOST)   { g_topmost = !g_topmost; RegSetDw(L"TopMost", g_topmost); ApplyTopmost(); }
         else if (id == ID_AUTOSTART) SetAutostart(!IsAutostart());
@@ -799,7 +802,8 @@ static BOOL CreateMainWindow() {
 
 int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, int) {
     g_hInst = hInst;
-    CreateMutexW(NULL, TRUE, L"Local\\Cogitator_Sallador_SingleInstance");
+    InitLang(REG_KEY);
+    g_mutexLang = CreateMutexW(NULL, TRUE, L"Local\\Cogitator_Sallador_SingleInstance");
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
         HWND w = FindWindowW(CLASS_NAME, NULL);
         if (w) PostMessageW(w, WM_APP_SHOW, 0, 0);

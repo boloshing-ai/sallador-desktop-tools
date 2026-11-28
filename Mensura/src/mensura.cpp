@@ -1,4 +1,4 @@
-﻿// Mensura 1.0 — desktop widget: remaining Claude plan usage limits (session / weekly).
+﻿// Mensura 1.1 — desktop widget: remaining Claude plan usage limits (session / weekly).
 // Windows 11 (Fluent) edition. Developer: Sallador.  Pure Win32 + GDI+ + WinHTTP, static CRT.
 //
 // Data source: the local Claude Code sign-in (%USERPROFILE%\.claude\.credentials.json) and the
@@ -24,6 +24,7 @@
 #include <wchar.h>
 #include "resource.h"
 #include "fluent.h"
+#include "lang.h"
 
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "shell32.lib")
@@ -468,19 +469,19 @@ static void Fetch() {
 
 // ───────────────────────────── text helpers ──────────────────────────
 static void LimitTitle(const char* key, WCHAR* out, int n) {
-    if (!strcmp(key, "five_hour"))             wcscpy_s(out, n, L"Текущая сессия");
-    else if (!strcmp(key, "seven_day"))        wcscpy_s(out, n, L"Неделя · все модели");
-    else if (!strcmp(key, "seven_day_sonnet")) wcscpy_s(out, n, L"Неделя · Sonnet");
-    else if (!strcmp(key, "seven_day_opus"))   wcscpy_s(out, n, L"Неделя · Opus");
-    else if (!strcmp(key, "seven_day_oauth_apps")) wcscpy_s(out, n, L"Неделя · приложения");
+    if (!strcmp(key, "five_hour"))             wcscpy_s(out, n, TR(L"Текущая сессия", L"Current session"));
+    else if (!strcmp(key, "seven_day"))        wcscpy_s(out, n, TR(L"Неделя · все модели", L"Week · all models"));
+    else if (!strcmp(key, "seven_day_sonnet")) wcscpy_s(out, n, TR(L"Неделя · Sonnet", L"Week · Sonnet"));
+    else if (!strcmp(key, "seven_day_opus"))   wcscpy_s(out, n, TR(L"Неделя · Opus", L"Week · Opus"));
+    else if (!strcmp(key, "seven_day_oauth_apps")) wcscpy_s(out, n, TR(L"Неделя · приложения", L"Week · apps"));
     else {
         MultiByteToWideChar(CP_UTF8, 0, key, -1, out, n); out[n - 1] = 0;
         for (WCHAR* p = out; *p; p++) if (*p == L'_') *p = L' ';
     }
 }
 static void ShortTitle(const char* key, WCHAR* out, int n) {
-    if (!strcmp(key, "five_hour"))             wcscpy_s(out, n, L"Сессия");
-    else if (!strcmp(key, "seven_day"))        wcscpy_s(out, n, L"Неделя");
+    if (!strcmp(key, "five_hour"))             wcscpy_s(out, n, TR(L"Сессия", L"Session"));
+    else if (!strcmp(key, "seven_day"))        wcscpy_s(out, n, TR(L"Неделя", L"Week"));
     else if (!strcmp(key, "seven_day_sonnet")) wcscpy_s(out, n, L"Sonnet");
     else if (!strcmp(key, "seven_day_opus"))   wcscpy_s(out, n, L"Opus");
     else LimitTitle(key, out, n);
@@ -489,14 +490,14 @@ static void ResetText(LONGLONG reset, WCHAR* out, int n) {
     out[0] = 0;
     if (!reset) return;
     LONGLONG d = (reset - NowUtc()) / 10000000LL;     // seconds
-    if (d <= 0) { wcscpy_s(out, n, L"сброс сейчас"); return; }
+    if (d <= 0) { wcscpy_s(out, n, TR(L"сброс сейчас", L"resets now")); return; }
     LONGLONG mins = (d + 59) / 60;
-    if (mins < 60) { swprintf_s(out, n, L"сброс через %lld мин", mins); return; }
-    if (mins < 24 * 60) { swprintf_s(out, n, L"сброс через %lld ч %lld мин", mins / 60, mins % 60); return; }
+    if (mins < 60) { swprintf_s(out, n, TR(L"сброс через %lld мин", L"resets in %lld min"), mins); return; }
+    if (mins < 24 * 60) { swprintf_s(out, n, TR(L"сброс через %lld ч %lld мин", L"resets in %lld h %lld min"), mins / 60, mins % 60); return; }
     FILETIME fu = { (DWORD)reset, (DWORD)(reset >> 32) }, fl; SYSTEMTIME st;
     FileTimeToLocalFileTime(&fu, &fl); FileTimeToSystemTime(&fl, &st);
-    static const WCHAR* dn[7] = { L"вс", L"пн", L"вт", L"ср", L"чт", L"пт", L"сб" };
-    swprintf_s(out, n, L"сброс %s, %02u:%02u", dn[st.wDayOfWeek % 7], st.wHour, st.wMinute);
+    static const WCHAR* dn[7] = { TR(L"вс", L"Sun"), TR(L"пн", L"Mon"), TR(L"вт", L"Tue"), TR(L"ср", L"Wed"), TR(L"чт", L"Thu"), TR(L"пт", L"Fri"), TR(L"сб", L"Sat") };
+    swprintf_s(out, n, TR(L"сброс %s, %02u:%02u", L"resets %s %02u:%02u"), dn[st.wDayOfWeek % 7], st.wHour, st.wMinute);
 }
 static int Used(const Limit* l) { int v = (int)(l->util + 0.5); return v < 0 ? 0 : v > 100 ? 100 : v; }
 static int Left(const Limit* l) { return 100 - Used(l); }
@@ -504,12 +505,12 @@ static Color LevelColor(int left) { return left <= 10 ? T.critical : left <= 25 
 
 static const WCHAR* StatusShort(int st) {
     switch (st) {
-    case ST_NOCREDS: return L"Нет входа в Claude Code";
-    case ST_AUTH:    return L"Вход истёк";
-    case ST_NET:     return L"Нет соединения";
-    case ST_RATE:    return L"Сервер просит подождать";
-    case ST_PARSE:   return L"Неизвестный формат ответа";
-    case ST_HTTP:    return L"Ошибка сервера";
+    case ST_NOCREDS: return TR(L"Нет входа в Claude Code", L"Not signed in to Claude Code");
+    case ST_AUTH:    return TR(L"Вход истёк", L"Sign-in expired");
+    case ST_NET:     return TR(L"Нет соединения", L"No connection");
+    case ST_RATE:    return TR(L"Сервер просит подождать", L"Server asks to wait");
+    case ST_PARSE:   return TR(L"Неизвестный формат ответа", L"Unknown response format");
+    case ST_HTTP:    return TR(L"Ошибка сервера", L"Server error");
     }
     return L"";
 }
@@ -549,7 +550,7 @@ static void PaintTo(Graphics& g) {
     DrawAppMark(g, D(14), D(14), D(16));
     FText(g, L"Mensura", g_fStrong, T.text, RectF(D(38), 0, D(120), D(HDR_H)));
     REAL tw = FTextW(g, L"Mensura", g_fStrong);
-    FText(g, L"·  лимиты Claude", g_fCaption, T.text3, RectF(D(38) + tw + D(8), 0, D(150), D(HDR_H)));
+    FText(g, TR(L"·  лимиты Claude", L"·  Claude limits"), g_fCaption, T.text3, RectF(D(38) + tw + D(8), 0, D(150), D(HDR_H)));
     const WCHAR* plan = g_data.plan[0] ? g_data.plan : NULL;
     if (plan) {
         REAL pw = FTextW(g, plan, g_fCaption) + D(14);
@@ -579,22 +580,22 @@ static void PaintTo(Graphics& g) {
             Color vc = left <= 10 ? T.critical : T.text;
             FText(g, buf, g_fSubtitle, vc, RectF(x + D(14), y + D(30), D(90), D(28)));
             REAL bw = FTextW(g, buf, g_fSubtitle);
-            FText(g, g_showLeft ? L"осталось" : L"израсходовано", g_fCaption, T.text2, RectF(x + D(14) + bw + D(6), y + D(33), D(120), D(26)));
-            swprintf_s(buf, g_showLeft ? L"израсходовано %d %%" : L"осталось %d %%", g_showLeft ? used : left);
+            FText(g, g_showLeft ? TR(L"осталось", L"left") : TR(L"израсходовано", L"used"), g_fCaption, T.text2, RectF(x + D(14) + bw + D(6), y + D(33), D(120), D(26)));
+            swprintf_s(buf, g_showLeft ? TR(L"израсходовано %d %%", L"used %d %%") : TR(L"осталось %d %%", L"left %d %%"), g_showLeft ? used : left);
             FText(g, buf, g_fCaption, T.text3, RectF(x + D(14), y + D(33), w - D(28), D(26)), AL_RIGHT);
             Bar(g, x + D(14), y + D(CARD_H - 16), w - D(28), (REAL)(g_showLeft ? left : used) / 100.0f, LevelColor(left));
         }
     } else {
         REAL x = D(12), y = D(CARD_Y), w = D(W - 24);
         FCard(g, RectF(x, y, w, D(CARD_H)));
-        const WCHAR *t1 = L"Загрузка…", *t2 = L"Получаю данные о лимитах";
+        const WCHAR *t1 = TR(L"Загрузка…", L"Loading…"), *t2 = TR(L"Получаю данные о лимитах", L"Getting your usage limits");
         switch (g_status) {
-        case ST_NOCREDS: t1 = L"Не найден вход в Claude Code"; t2 = L"Войдите в Claude Code командой /login"; break;
-        case ST_AUTH:    t1 = L"Срок входа истёк";             t2 = L"Откройте Claude Code — вход обновится сам"; break;
-        case ST_NET:     t1 = L"Нет соединения с сервером";    t2 = L"Повторю попытку через минуту"; break;
-        case ST_RATE:    t1 = L"Сервер просит подождать";      t2 = L"Повторю попытку через несколько минут"; break;
-        case ST_PARSE:   t1 = L"Неизвестный формат ответа";    t2 = L"Возможно, Anthropic изменили API"; break;
-        case ST_HTTP:    swprintf_s(buf, L"Ошибка сервера (%lu)", g_httpCode); t1 = buf; t2 = L"Повторю попытку позже"; break;
+        case ST_NOCREDS: t1 = TR(L"Не найден вход в Claude Code", L"No Claude Code sign-in found"); t2 = TR(L"Войдите в Claude Code командой /login", L"Sign in to Claude Code with /login"); break;
+        case ST_AUTH:    t1 = TR(L"Срок входа истёк", L"Sign-in has expired");             t2 = TR(L"Откройте Claude Code — вход обновится сам", L"Open Claude Code to renew the sign-in"); break;
+        case ST_NET:     t1 = TR(L"Нет соединения с сервером", L"Cannot reach the server");    t2 = TR(L"Повторю попытку через минуту", L"Will retry in a minute"); break;
+        case ST_RATE:    t1 = TR(L"Сервер просит подождать", L"Server asks to wait");      t2 = TR(L"Повторю попытку через несколько минут", L"Will retry in a few minutes"); break;
+        case ST_PARSE:   t1 = TR(L"Неизвестный формат ответа", L"Unknown response format");    t2 = TR(L"Возможно, Anthropic изменили API", L"Anthropic may have changed the API"); break;
+        case ST_HTTP:    swprintf_s(buf, TR(L"Ошибка сервера (%lu)", L"Server error (%lu)"), g_httpCode); t1 = buf; t2 = TR(L"Повторю попытку позже", L"Will retry later"); break;
         }
         BOOL err = g_status != ST_NONE && g_status != ST_OK;
         FGlyph(g, GL_INFO, D(16), err ? T.caution : T.text2, RectF(x + D(12), y + D(14), D(20), D(22)));
@@ -606,11 +607,11 @@ static void PaintTo(Graphics& g) {
     REAL fy = D(BH - FOOT_H);
     FFillRect(g, D(12), fy, D(W - 24), 1.0f, T.divider);
     Color fc = T.text3;
-    if (g_fetching) wcscpy_s(buf, L"Обновление…");
+    if (g_fetching) wcscpy_s(buf, TR(L"Обновление…", L"Updating…"));
     else if (g_haveData && g_status != ST_OK && g_status != ST_NONE) {
-        swprintf_s(buf, L"%s · данные от %02u:%02u", StatusShort(g_status), g_dataTime.wHour, g_dataTime.wMinute);
+        swprintf_s(buf, TR(L"%s · данные от %02u:%02u", L"%s · data from %02u:%02u"), StatusShort(g_status), g_dataTime.wHour, g_dataTime.wMinute);
         fc = T.caution;
-    } else if (g_haveData) swprintf_s(buf, L"Обновлено в %02u:%02u%s", g_dataTime.wHour, g_dataTime.wMinute, g_demo ? L" · демо" : L"");
+    } else if (g_haveData) swprintf_s(buf, TR(L"Обновлено в %02u:%02u%s", L"Updated at %02u:%02u%s"), g_dataTime.wHour, g_dataTime.wMinute, g_demo ? TR(L" · демо", L" · demo") : L"");
     else buf[0] = 0;
     FText(g, buf, g_fCaption, fc, RectF(D(20), fy + D(1), D(W - 70), D(FOOT_H - 1)), AL_LEFT, StringTrimmingEllipsisCharacter);
     RectF rr = RF(g_rc[H_REFRESH]);
@@ -660,7 +661,7 @@ static void TrayAdd() {
     g_nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
     g_nid.uCallbackMessage = WM_TRAY;
     g_nid.hIcon = g_iconSm;
-    wcscpy_s(g_nid.szTip, L"Mensura — лимиты Claude");
+    wcscpy_s(g_nid.szTip, TR(L"Mensura — лимиты Claude", L"Mensura — Claude limits"));
     Shell_NotifyIconW(NIM_ADD, &g_nid);
 }
 static void TrayTip() {
@@ -668,7 +669,7 @@ static void TrayTip() {
     if (g_haveData) {
         for (int i = 0; i < g_data.n && i < 3; i++) {
             ShortTitle(g_data.lim[i].key, t, 48);
-            swprintf_s(line, L"\n%s: осталось %d %%", t, Left(&g_data.lim[i]));
+            swprintf_s(line, TR(L"\n%s: осталось %d %%", L"\n%s: %d %% left"), t, Left(&g_data.lim[i]));
             if (wcslen(tip) + wcslen(line) < 127) wcscat_s(tip, line);
         }
     } else if (g_status > ST_OK) { wcscat_s(tip, L"\n"); wcscat_s(tip, StatusShort(g_status)); }
@@ -701,8 +702,8 @@ static void CheckWarnings() {
             if (g_warn && g_warnInit) {
                 WCHAR t[64], r[64], msg[200];
                 LimitTitle(l->key, t, 64); ResetText(l->reset, r, 64);
-                swprintf_s(msg, L"%s: осталось %d %%%s%s", t, Left(l), r[0] ? L"\n" : L"", r);
-                Notify(lvl == 2 ? L"Лимит Claude почти исчерпан" : L"Лимит Claude заканчивается", msg);
+                swprintf_s(msg, TR(L"%s: осталось %d %%%s%s", L"%s: %d %% left%s%s"), t, Left(l), r[0] ? L"\n" : L"", r);
+                Notify(lvl == 2 ? TR(L"Лимит Claude почти исчерпан", L"Claude limit almost used up") : TR(L"Лимит Claude заканчивается", L"Claude limit running low"), msg);
             }
         }
     }
@@ -739,23 +740,24 @@ static void ShowMenu(POINT pt) {
     HMENU m = CreatePopupMenu(), every = CreatePopupMenu();
     static const int mins[4] = { 1, 2, 5, 10 };
     for (int i = 0; i < 4; i++) {
-        WCHAR s[32]; swprintf_s(s, L"Каждые %d мин", mins[i]);
+        WCHAR s[32]; swprintf_s(s, TR(L"Каждые %d мин", L"Every %d min"), mins[i]);
         AppendMenuW(every, MF_STRING | (g_everyMin == mins[i] ? MF_CHECKED : 0), ID_EVERY_1 + i, s);
     }
-    AppendMenuW(m, MF_STRING, ID_REFRESH, L"Обновить сейчас");
-    AppendMenuW(m, MF_POPUP, (UINT_PTR)every, L"Частота обновления");
+    AppendMenuW(m, MF_STRING, ID_REFRESH, TR(L"Обновить сейчас", L"Refresh now"));
+    AppendMenuW(m, MF_POPUP, (UINT_PTR)every, TR(L"Частота обновления", L"Refresh interval"));
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
-    AppendMenuW(m, MF_STRING | (g_showLeft ? MF_CHECKED : 0), ID_MODE_LEFT, L"Показывать остаток");
-    AppendMenuW(m, MF_STRING | (!g_showLeft ? MF_CHECKED : 0), ID_MODE_USED, L"Показывать израсходованное");
-    AppendMenuW(m, MF_STRING | (g_warn ? MF_CHECKED : 0), ID_WARN, L"Предупреждать при 80 % и 95 %");
+    AppendMenuW(m, MF_STRING | (g_showLeft ? MF_CHECKED : 0), ID_MODE_LEFT, TR(L"Показывать остаток", L"Show remaining"));
+    AppendMenuW(m, MF_STRING | (!g_showLeft ? MF_CHECKED : 0), ID_MODE_USED, TR(L"Показывать израсходованное", L"Show used"));
+    AppendMenuW(m, MF_STRING | (g_warn ? MF_CHECKED : 0), ID_WARN, TR(L"Предупреждать при 80 % и 95 %", L"Warn at 80 % and 95 %"));
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
-    AppendMenuW(m, MF_STRING | (g_acrylic ? MF_CHECKED : 0), ID_ACRYLIC, L"Прозрачный фон");
-    AppendMenuW(m, MF_STRING | (g_topmost ? MF_CHECKED : 0), ID_TOPMOST, L"Поверх всех окон");
-    AppendMenuW(m, MF_STRING | (IsAutostart() ? MF_CHECKED : 0), ID_AUTOSTART, L"Запускать вместе с Windows");
+    AppendMenuW(m, MF_STRING | (g_acrylic ? MF_CHECKED : 0), ID_ACRYLIC, TR(L"Прозрачный фон", L"Transparent background"));
+    AppendMenuW(m, MF_STRING | (g_topmost ? MF_CHECKED : 0), ID_TOPMOST, TR(L"Поверх всех окон", L"Always on top"));
+    AppendMenuW(m, MF_STRING | (IsAutostart() ? MF_CHECKED : 0), ID_AUTOSTART, TR(L"Запускать вместе с Windows", L"Start with Windows"));
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
-    AppendMenuW(m, MF_STRING, ID_SHOWHIDE, g_visible ? L"Скрыть виджет" : L"Показать виджет");
-    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, L"Mensura 1.0 · разработчик Sallador");
-    AppendMenuW(m, MF_STRING, ID_EXIT, L"Выход");
+    AppendMenuW(m, MF_STRING, ID_SHOWHIDE, g_visible ? TR(L"Скрыть виджет", L"Hide widget") : TR(L"Показать виджет", L"Show widget"));
+    AppendLangMenu(m, REG_KEY);
+    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, TR(L"Mensura 1.1 · разработчик Sallador", L"Mensura 1.1 · by Sallador"));
+    AppendMenuW(m, MF_STRING, ID_EXIT, TR(L"Выход", L"Exit"));
     SetForegroundWindow(g_hwnd);
     TrackPopupMenu(m, TPM_RIGHTBUTTON, pt.x, pt.y, 0, g_hwnd, NULL);
     PostMessageW(g_hwnd, WM_NULL, 0, 0);
@@ -883,6 +885,7 @@ static LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM w, LPARAM l) {
         return 0;
     case WM_COMMAND: {
         int id = LOWORD(w);
+        if (id >= ID_LANG_AUTO && id <= ID_LANG_EN) { RestartForLang(REG_KEY, id - ID_LANG_AUTO, g_demo ? L"/demo" : NULL); g_exiting = TRUE; DestroyWindow(h); return 0; }
         if (id == ID_TOPMOST)        { g_topmost = !g_topmost; RegSetDw(L"TopMost", g_topmost); ApplyTopmost(); }
         else if (id == ID_AUTOSTART) SetAutostart(!IsAutostart());
         else if (id == ID_ACRYLIC)   { g_acrylic = !g_acrylic; RegSetDw(L"Acrylic", g_acrylic); ApplyBackdrop(); InvalidateRect(h, NULL, FALSE); }
@@ -942,8 +945,9 @@ static BOOL CreateMainWindow() {
 
 int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR cmd, int) {
     g_hInst = hInst;
+    InitLang(REG_KEY);
     g_demo = cmd && wcsstr(cmd, L"/demo") != NULL;
-    CreateMutexW(NULL, TRUE, g_demo ? L"Local\\Mensura_Sallador_Demo" : L"Local\\Mensura_Sallador_SingleInstance");
+    g_mutexLang = CreateMutexW(NULL, TRUE, g_demo ? L"Local\\Mensura_Sallador_Demo" : L"Local\\Mensura_Sallador_SingleInstance");
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
         HWND w = FindWindowW(CLASS_NAME, NULL);
         if (w) PostMessageW(w, WM_APP_SHOW, 0, 0);

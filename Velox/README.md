@@ -4,7 +4,7 @@
 
 A desktop widget that shows which applications are using the internet right now, at what speed, and how much each of them has downloaded.
 
-Version 1.0.0 · Developer: **Sallador**
+Version 1.1.0 · Developer: **Sallador**
 
 <img src="../docs/velox.png" width="360">
 
@@ -29,12 +29,12 @@ Without administrator rights Velox runs in a limited mode: it shows only the tot
 
 ## Install
 
-Run `Velox_Setup_1.0.0.exe` from [Releases](../../../releases) and confirm the UAC prompt. It installs to `C:\Program Files\Velox`. Uninstall from *Settings → Apps*. The uninstaller also removes the Task Scheduler tasks.
+Run `Velox_Setup_1.1.0.exe` from [Releases](../../../releases) and confirm the UAC prompt. It installs to `C:\Program Files\Velox`. Uninstall from *Settings → Apps*. The uninstaller also removes the Task Scheduler tasks.
 
 Silent install (from an elevated prompt):
 
 ```
-Velox_Setup_1.0.0.exe /S [/D=<folder>] [/nodesktop] [/noautostart] [/nolaunch]
+Velox_Setup_1.1.0.exe /S [/D=<folder>] [/nodesktop] [/noautostart] [/nolaunch]
 uninstall.exe /uninstall /S
 ```
 
@@ -49,7 +49,7 @@ Right-click the widget or click **…** for the menu. Drag the widget with the m
 
 ## Build
 
-Visual Studio 2022 (C++ workload) → run `build.bat`. It produces `bin\Velox.exe` and `dist\Velox_Setup_1.0.0.exe`.
+Visual Studio 2022 (C++ workload) → run `build.bat`. It produces `bin\Velox.exe` and `dist\Velox_Setup_1.1.0.exe`.
 
 Settings are stored in `HKCU\Software\Sallador\Velox`.
 
@@ -63,7 +63,7 @@ Settings are stored in `HKCU\Software\Sallador\Velox`.
 
 Виджет для рабочего стола, который показывает, какие приложения пользуются интернетом прямо сейчас, с какой скоростью и сколько каждое из них уже скачало.
 
-Версия 1.0.0 · Разработчик: **Sallador**
+Версия 1.1.0 · Разработчик: **Sallador**
 
 ## Возможности
 
@@ -86,12 +86,12 @@ Windows отдаёт статистику сети по приложениям �
 
 ## Установка
 
-Запустите `Velox_Setup_1.0.0.exe` из [Releases](../../../releases) и подтвердите запрос UAC. Программа ставится в `C:\Program Files\Velox`. Удаление — «Параметры → Приложения»; при этом удаляются и задания Планировщика.
+Запустите `Velox_Setup_1.1.0.exe` из [Releases](../../../releases) и подтвердите запрос UAC. Программа ставится в `C:\Program Files\Velox`. Удаление — «Параметры → Приложения»; при этом удаляются и задания Планировщика.
 
 Тихая установка (из командной строки с правами администратора):
 
 ```
-Velox_Setup_1.0.0.exe /S [/D=<папка>] [/nodesktop] [/noautostart] [/nolaunch]
+Velox_Setup_1.1.0.exe /S [/D=<папка>] [/nodesktop] [/noautostart] [/nolaunch]
 uninstall.exe /uninstall /S
 ```
 
@@ -106,6 +106,6 @@ uninstall.exe /uninstall /S
 
 ## Сборка
 
-Visual Studio 2022 (компонент C++) → запустите `build.bat`. Получите `bin\Velox.exe` и `dist\Velox_Setup_1.0.0.exe`.
+Visual Studio 2022 (компонент C++) → запустите `build.bat`. Получите `bin\Velox.exe` и `dist\Velox_Setup_1.1.0.exe`.
 
 Настройки хранятся в `HKCU\Software\Sallador\Velox`.

@@ -17,16 +17,16 @@ Four tiny native utilities for Windows 11 by **Sallador**, built in the Windows 
 - **Windows 11 look** — Mica / Acrylic backdrop, rounded corners, Segoe UI Variable, Segoe Fluent Icons, Settings-style toggles. They follow the system light/dark theme and accent colour automatically.
 - **No admin rights** (except Velox, see its README) — per-user installer (`%LOCALAPPDATA%\Programs`), uninstall from *Settings → Apps*. Silent install supported.
 - **Start with Windows** — optional, can be turned on in the installer or the app menu.
-- **Russian interface.**
+- **Russian and English interface.** The language follows Windows and can be switched in the app menu (*Language · Язык*).
 
 ### Download
 
 Get the installers from **[Releases](../../releases)**:
 
-- `Cogitator_Setup_2.1.0.exe`
-- `Noctis_Setup_1.1.0.exe`
-- `Mensura_Setup_1.0.0.exe`
-- `Velox_Setup_1.0.0.exe`
+- `Cogitator_Setup_2.2.0.exe`
+- `Noctis_Setup_1.2.0.exe`
+- `Mensura_Setup_1.1.0.exe`
+- `Velox_Setup_1.1.0.exe`
 
 The installers are not code-signed, so Windows SmartScreen may show *"Windows protected your PC"*. Click **More info → Run anyway**.
 
@@ -59,16 +59,16 @@ Tested on Windows 11.
 - **Внешний вид Windows 11** — подложка Mica / Acrylic, скруглённые углы, Segoe UI Variable, значки Segoe Fluent Icons, переключатели как в «Параметрах». Сами подстраиваются под светлую/тёмную тему и акцентный цвет системы.
 - **Без прав администратора** (кроме Velox, см. его описание) — установка в профиль пользователя (`%LOCALAPPDATA%\Programs`), удаление через «Параметры → Приложения». Есть тихая установка.
 - **Автозапуск с Windows** — по желанию, включается в установщике или в меню программы.
-- **Интерфейс на русском языке.**
+- **Интерфейс на русском и английском.** Язык выбирается по языку Windows, переключить его можно в меню программы («Язык · Language»).
 
 ### Скачать
 
 Установщики — в разделе **[Releases](../../releases)**:
 
-- `Cogitator_Setup_2.1.0.exe`
-- `Noctis_Setup_1.1.0.exe`
-- `Mensura_Setup_1.0.0.exe`
-- `Velox_Setup_1.0.0.exe`
+- `Cogitator_Setup_2.2.0.exe`
+- `Noctis_Setup_1.2.0.exe`
+- `Mensura_Setup_1.1.0.exe`
+- `Velox_Setup_1.1.0.exe`
 
 Установщики не подписаны цифровой подписью, поэтому SmartScreen может показать *«Система Windows защитила ваш компьютер»*. Нажмите **Подробнее → Выполнить в любом случае**.
 

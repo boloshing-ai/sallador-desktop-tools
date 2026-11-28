@@ -1,4 +1,4 @@
-// Velox 1.0 — desktop widget: which applications use the network, their speed and downloaded volume.
+﻿// Velox 1.1 — desktop widget: which applications use the network, their speed and downloaded volume.
 // Windows 11 (Fluent) edition. Developer: Sallador.  Pure Win32 + GDI+ + ETW, static CRT.
 //
 // Per-process traffic comes from a real-time ETW session on the Microsoft-Windows-Kernel-Network
@@ -32,6 +32,7 @@
 #include <wchar.h>
 #include "resource.h"
 #include "fluent.h"
+#include "lang.h"
 #include "tasks.h"
 
 #pragma comment(lib, "user32.lib")
@@ -324,7 +325,7 @@ static int ResolvePid(ULONG pid) {
         if (g_pidMap[i].key == 0) break;
     }
     WCHAR name[48] = L"";
-    if (pid == 0 || pid == 4) wcscpy_s(name, L"Система");
+    if (pid == 0 || pid == 4) wcscpy_s(name, TR(L"Система", L"System"));
     else {
         if (!g_snap) g_snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
         PROCESSENTRY32W pe = { sizeof(pe) };
@@ -337,10 +338,10 @@ static int ResolvePid(ULONG pid) {
                     break;
                 }
             } while (Process32NextW(g_snap, &pe));
-        if (!name[0]) wcscpy_s(name, L"Завершённые процессы");
+        if (!name[0]) wcscpy_s(name, TR(L"Завершённые процессы", L"Exited processes"));
     }
     int gi = FindOrAddGroup(name, pid);
-    if (pid == 0 || pid == 4) { if (gi >= 0) wcscpy_s(g_groups[gi].title, L"Система"); }
+    if (pid == 0 || pid == 4) { if (gi >= 0) wcscpy_s(g_groups[gi].title, TR(L"Система", L"System")); }
     i = (key * 2654435761u) & (PIDMAP_SIZE - 1);
     for (int probe = 0; probe < 64; probe++, i = (i + 1) & (PIDMAP_SIZE - 1))
         if (g_pidMap[i].key == 0) { g_pidMap[i].key = key; g_pidMap[i].group = gi; break; }
@@ -429,7 +430,7 @@ static void ResetCounters() {
     BuildTop();
 }
 static void DemoData() {
-    static const WCHAR* t[7] = { L"qBittorrent", L"Google Chrome", L"Steam", L"Discord", L"Microsoft Edge", L"OneDrive", L"Система" };
+    static const WCHAR* t[7] = { L"qBittorrent", L"Google Chrome", L"Steam", L"Discord", L"Microsoft Edge", L"OneDrive", TR(L"Система", L"System") };
     static const WCHAR* e[7] = { L"qbittorrent", L"chrome", L"steam", L"Discord", L"msedge", L"OneDrive", L"System" };
     static const double di[7] = { 9.4e6, 1.25e6, 3.1e6, 52e3, 18e3, 0, 2e3 };
     static const double uo[7] = { 1.6e6, 96e3, 21e3, 38e3, 4e3, 410e3, 1e3 };
@@ -452,31 +453,31 @@ static void DemoData() {
 }
 
 // ───────────────────────────── formatting ────────────────────────────
-static void Comma(WCHAR* s) { for (; *s; s++) if (*s == L'.') *s = L','; }
+static void Comma(WCHAR* s) { if (g_en) return; for (; *s; s++) if (*s == L'.') *s = L','; }
 static void FmtSpeed(WCHAR* b, int n, double bps, BOOL dashZero) {
     if (dashZero && bps < 1) { wcscpy_s(b, n, L"—"); return; }
     if (g_bits) {
         double v = bps * 8;
-        if (v < 1e6)       swprintf_s(b, n, L"%.0f Кбит/с", v / 1e3);
-        else if (v < 1e8)  swprintf_s(b, n, L"%.1f Мбит/с", v / 1e6);
-        else if (v < 1e9)  swprintf_s(b, n, L"%.0f Мбит/с", v / 1e6);
-        else               swprintf_s(b, n, L"%.2f Гбит/с", v / 1e9);
+        if (v < 1e6)       swprintf_s(b, n, TR(L"%.0f Кбит/с", L"%.0f Kbps"), v / 1e3);
+        else if (v < 1e8)  swprintf_s(b, n, TR(L"%.1f Мбит/с", L"%.1f Mbps"), v / 1e6);
+        else if (v < 1e9)  swprintf_s(b, n, TR(L"%.0f Мбит/с", L"%.0f Mbps"), v / 1e6);
+        else               swprintf_s(b, n, TR(L"%.2f Гбит/с", L"%.2f Gbps"), v / 1e9);
     } else {
-        if (bps < 1000)                 swprintf_s(b, n, L"%.0f Б/с", bps);
-        else if (bps < 1000.0 * 1024)   swprintf_s(b, n, L"%.0f КБ/с", bps / 1024);
-        else if (bps < 100.0 * 1048576) swprintf_s(b, n, L"%.1f МБ/с", bps / 1048576);
-        else if (bps < 1000.0 * 1048576) swprintf_s(b, n, L"%.0f МБ/с", bps / 1048576);
-        else                            swprintf_s(b, n, L"%.2f ГБ/с", bps / 1073741824.0);
+        if (bps < 1000)                 swprintf_s(b, n, TR(L"%.0f Б/с", L"%.0f B/s"), bps);
+        else if (bps < 1000.0 * 1024)   swprintf_s(b, n, TR(L"%.0f КБ/с", L"%.0f KB/s"), bps / 1024);
+        else if (bps < 100.0 * 1048576) swprintf_s(b, n, TR(L"%.1f МБ/с", L"%.1f MB/s"), bps / 1048576);
+        else if (bps < 1000.0 * 1048576) swprintf_s(b, n, TR(L"%.0f МБ/с", L"%.0f MB/s"), bps / 1048576);
+        else                            swprintf_s(b, n, TR(L"%.2f ГБ/с", L"%.2f GB/s"), bps / 1073741824.0);
     }
     Comma(b);
 }
 static void FmtSize(WCHAR* b, int n, ULONGLONG v) {
     double d = (double)v;
-    if (d < 1000)                    swprintf_s(b, n, L"%.0f Б", d);
-    else if (d < 1000.0 * 1024)      swprintf_s(b, n, L"%.0f КБ", d / 1024);
-    else if (d < 100.0 * 1048576)    swprintf_s(b, n, L"%.1f МБ", d / 1048576);
-    else if (d < 1000.0 * 1048576)   swprintf_s(b, n, L"%.0f МБ", d / 1048576);
-    else                             swprintf_s(b, n, L"%.2f ГБ", d / 1073741824.0);
+    if (d < 1000)                    swprintf_s(b, n, TR(L"%.0f Б", L"%.0f B"), d);
+    else if (d < 1000.0 * 1024)      swprintf_s(b, n, TR(L"%.0f КБ", L"%.0f KB"), d / 1024);
+    else if (d < 100.0 * 1048576)    swprintf_s(b, n, TR(L"%.1f МБ", L"%.1f MB"), d / 1048576);
+    else if (d < 1000.0 * 1048576)   swprintf_s(b, n, TR(L"%.0f МБ", L"%.0f MB"), d / 1048576);
+    else                             swprintf_s(b, n, TR(L"%.2f ГБ", L"%.2f GB"), d / 1073741824.0);
     Comma(b);
 }
 
@@ -526,7 +527,7 @@ static void PaintTo(Graphics& g) {
     FText(g, L"Velox", g_fStrong, T.text, RectF(D(38), 0, D(120), D(HDR_H)));
     REAL tw = FTextW(g, L"Velox", g_fStrong);
     FText(g, L"·  Sallador", g_fCaption, T.text3, RectF(D(38) + tw + D(8), 0, D(120), D(HDR_H)));
-    FText(g, g_etwOk ? (g_countLan ? L"Интернет и локальная сеть" : L"Интернет") : L"Ограниченный режим",
+    FText(g, g_etwOk ? (g_countLan ? TR(L"Интернет и локальная сеть", L"Internet and local network") : TR(L"Интернет", L"Internet")) : TR(L"Ограниченный режим", L"Limited mode"),
           g_fCaption, g_etwOk ? T.text3 : T.caution, RectF(D(W - 230), 0, D(184), D(HDR_H)), AL_RIGHT);
     RectF mr = RF(g_rc[H_MORE]);
     if (Hv(H_MORE)) FillRR(g, mr, D(4), Pr(H_MORE) ? T.subtlePress : T.subtleHover);
@@ -542,12 +543,12 @@ static void PaintTo(Graphics& g) {
         if (i < 2) {
             BOOL dn = i == 0;
             FGlyph(g, dn ? GL_DOWN : GL_UP, D(11), dn ? T.accent : upColor, RectF(D(x + 10), D(TILE_Y + 8), D(14), D(18)));
-            FText(g, dn ? L"Загрузка" : L"Отдача", g_fCaption, T.text2, RectF(D(x + 28), D(TILE_Y + 8), D(tileW - 36), D(18)));
+            FText(g, dn ? TR(L"Загрузка", L"Download") : TR(L"Отдача", L"Upload"), g_fCaption, T.text2, RectF(D(x + 28), D(TILE_Y + 8), D(tileW - 36), D(18)));
             FmtSpeed(buf, 40, dn ? g_spdIn : g_spdOut, FALSE);
             FText(g, buf, g_fValue, T.text, RectF(D(x + 10), D(TILE_Y + 26), D(tileW - 16), D(26)), AL_LEFT, StringTrimmingEllipsisCharacter);
             Spark(g, RectF(D(x + 10), D(TILE_Y + 56), D(tileW - 20), D(20)), dn ? g_hIn : g_hOut, dn ? T.accent : upColor);
         } else {
-            FText(g, L"За сеанс", g_fCaption, T.text2, RectF(D(x + 10), D(TILE_Y + 8), D(tileW - 20), D(18)));
+            FText(g, TR(L"За сеанс", L"This session"), g_fCaption, T.text2, RectF(D(x + 10), D(TILE_Y + 8), D(tileW - 20), D(18)));
             FGlyph(g, GL_DOWN, D(11), T.accent, RectF(D(x + 10), D(TILE_Y + 30), D(14), D(22)));
             FmtSize(buf, 40, g_sesIn);
             FText(g, buf, g_fStrong, T.text, RectF(D(x + 28), D(TILE_Y + 30), D(tileW - 34), D(22)));
@@ -558,8 +559,8 @@ static void PaintTo(Graphics& g) {
     }
 
     // ── column header
-    FText(g, L"Приложение", g_fCaption, T.text2, RectF(D(20), D(TH_Y), D(140), D(TH_H)));
-    static const WCHAR* hdr[3] = { L"Загрузка", L"Отдача", L"Скачано" };
+    FText(g, TR(L"Приложение", L"App"), g_fCaption, T.text2, RectF(D(20), D(TH_Y), D(140), D(TH_H)));
+    static const WCHAR* hdr[3] = { TR(L"Загрузка", L"Down"), TR(L"Отдача", L"Up"), TR(L"Скачано", L"Total") };
     for (int c = 0; c < 3; c++) {
         int id = H_COL0 + c, x, w; ColDip(c, &x, &w);
         if (Hv(id)) FillRR(g, RF(g_rc[id]), D(4), Pr(id) ? T.subtlePress : T.subtleHover);
@@ -575,10 +576,10 @@ static void PaintTo(Graphics& g) {
     // ── rows
     if (!g_etwOk) {
         FGlyph(g, GL_SHIELD, D(24), T.text2, RectF(0, D(ROW_Y + 22), D(W), D(30)));
-        FText(g, L"Чтобы видеть трафик каждого приложения,", g_fBody, T.text, RectF(0, D(ROW_Y + 58), D(W), D(22)), AL_CENTER);
-        FText(g, L"Velox нужны права администратора", g_fBody, T.text, RectF(0, D(ROW_Y + 80), D(W), D(22)), AL_CENTER);
-        FButton(g, RF(g_rc[H_ELEVATE]), L"Перезапустить с правами", TRUE, Hv(H_ELEVATE), Pr(H_ELEVATE), GL_SHIELD);
-        FText(g, L"Общая скорость вверху работает и без них", g_fCaption, T.text3, RectF(0, D(ROW_Y + 156), D(W), D(20)), AL_CENTER);
+        FText(g, TR(L"Чтобы видеть трафик каждого приложения,", L"To see the traffic of each app,"), g_fBody, T.text, RectF(0, D(ROW_Y + 58), D(W), D(22)), AL_CENTER);
+        FText(g, TR(L"Velox нужны права администратора", L"Velox needs administrator rights"), g_fBody, T.text, RectF(0, D(ROW_Y + 80), D(W), D(22)), AL_CENTER);
+        FButton(g, RF(g_rc[H_ELEVATE]), TR(L"Перезапустить с правами", L"Restart as administrator"), TRUE, Hv(H_ELEVATE), Pr(H_ELEVATE), GL_SHIELD);
+        FText(g, TR(L"Общая скорость вверху работает и без них", L"The total speed above works without them"), g_fCaption, T.text3, RectF(0, D(ROW_Y + 156), D(W), D(20)), AL_CENTER);
     } else {
         double maxm = 0;
         for (int i = 0; i < g_topN; i++) { double m = Metric(g_top[i]); if (m > maxm) maxm = m; }
@@ -612,13 +613,13 @@ static void PaintTo(Graphics& g) {
             }
         }
         if (g_topN == 0)
-            FText(g, L"Пока ни одно приложение не обращалось к сети", g_fBody, T.text3, RectF(0, D(ROW_Y), D(W), D(ROW_H * 2)), AL_CENTER);
+            FText(g, TR(L"Пока ни одно приложение не обращалось к сети", L"No app has used the network yet"), g_fBody, T.text3, RectF(0, D(ROW_Y), D(W), D(ROW_H * 2)), AL_CENTER);
     }
 
     // ── footer
     FFillRect(g, D(12), D(FOOT_Y), D(W - 24), 1.0f, T.divider);
-    if (g_etwOk) swprintf_s(buf, L"Активных приложений: %d  ·  Счётчики с %02u:%02u", g_active, g_since.wHour, g_since.wMinute);
-    else swprintf_s(buf, L"Счётчики с %02u:%02u", g_since.wHour, g_since.wMinute);
+    if (g_etwOk) swprintf_s(buf, TR(L"Активных приложений: %d  ·  Счётчики с %02u:%02u", L"Active apps: %d  ·  Counting since %02u:%02u"), g_active, g_since.wHour, g_since.wMinute);
+    else swprintf_s(buf, TR(L"Счётчики с %02u:%02u", L"Counting since %02u:%02u"), g_since.wHour, g_since.wMinute);
     FText(g, buf, g_fCaption, T.text3, RectF(D(20), D(FOOT_Y + 1), D(W - 40), D(BASE_H - FOOT_Y - 1)), AL_LEFT, StringTrimmingEllipsisCharacter);
 }
 
@@ -671,7 +672,7 @@ static void TrayAdd() {
 static void TrayTip() {
     WCHAR a[40], b[40];
     FmtSpeed(a, 40, g_spdIn, FALSE); FmtSpeed(b, 40, g_spdOut, FALSE);
-    swprintf_s(g_nid.szTip, L"Velox\nЗагрузка %s\nОтдача %s", a, b);
+    swprintf_s(g_nid.szTip, TR(L"Velox\nЗагрузка %s\nОтдача %s", L"Velox\nDownload %s\nUpload %s"), a, b);
     g_nid.uFlags = NIF_TIP;
     Shell_NotifyIconW(NIM_MODIFY, &g_nid);
 }
@@ -698,22 +699,23 @@ static void ToggleAutostart() {
 }
 static void ShowMenu(POINT pt) {
     HMENU m = CreatePopupMenu();
-    AppendMenuW(m, MF_STRING | (g_sort == SORT_DOWN ? MF_CHECKED : 0), ID_SORT_DOWN, L"Сортировать по загрузке");
-    AppendMenuW(m, MF_STRING | (g_sort == SORT_UP ? MF_CHECKED : 0), ID_SORT_UP, L"Сортировать по отдаче");
-    AppendMenuW(m, MF_STRING | (g_sort == SORT_TOTAL ? MF_CHECKED : 0), ID_SORT_TOTAL, L"Сортировать по объёму");
+    AppendMenuW(m, MF_STRING | (g_sort == SORT_DOWN ? MF_CHECKED : 0), ID_SORT_DOWN, TR(L"Сортировать по загрузке", L"Sort by download"));
+    AppendMenuW(m, MF_STRING | (g_sort == SORT_UP ? MF_CHECKED : 0), ID_SORT_UP, TR(L"Сортировать по отдаче", L"Sort by upload"));
+    AppendMenuW(m, MF_STRING | (g_sort == SORT_TOTAL ? MF_CHECKED : 0), ID_SORT_TOTAL, TR(L"Сортировать по объёму", L"Sort by volume"));
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
-    AppendMenuW(m, MF_STRING | (g_bits ? MF_CHECKED : 0), ID_BITS, L"Скорость в мегабитах (Мбит/с)");
-    AppendMenuW(m, MF_STRING | (g_countLan ? MF_CHECKED : 0), ID_LAN, L"Учитывать локальную сеть");
-    AppendMenuW(m, MF_STRING, ID_RESET, L"Сбросить счётчики");
+    AppendMenuW(m, MF_STRING | (g_bits ? MF_CHECKED : 0), ID_BITS, TR(L"Скорость в мегабитах (Мбит/с)", L"Speed in megabits (Mbps)"));
+    AppendMenuW(m, MF_STRING | (g_countLan ? MF_CHECKED : 0), ID_LAN, TR(L"Учитывать локальную сеть", L"Include local network"));
+    AppendMenuW(m, MF_STRING, ID_RESET, TR(L"Сбросить счётчики", L"Reset counters"));
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
-    AppendMenuW(m, MF_STRING | (g_acrylic ? MF_CHECKED : 0), ID_ACRYLIC, L"Прозрачный фон");
-    AppendMenuW(m, MF_STRING | (g_topmost ? MF_CHECKED : 0), ID_TOPMOST, L"Поверх всех окон");
+    AppendMenuW(m, MF_STRING | (g_acrylic ? MF_CHECKED : 0), ID_ACRYLIC, TR(L"Прозрачный фон", L"Transparent background"));
+    AppendMenuW(m, MF_STRING | (g_topmost ? MF_CHECKED : 0), ID_TOPMOST, TR(L"Поверх всех окон", L"Always on top"));
     int as = AutostartState();
-    AppendMenuW(m, MF_STRING | (as == 1 ? MF_CHECKED : 0) | (as == -2 ? MF_GRAYED : 0), ID_AUTOSTART, L"Запускать вместе с Windows");
+    AppendMenuW(m, MF_STRING | (as == 1 ? MF_CHECKED : 0) | (as == -2 ? MF_GRAYED : 0), ID_AUTOSTART, TR(L"Запускать вместе с Windows", L"Start with Windows"));
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
-    AppendMenuW(m, MF_STRING, ID_SHOWHIDE, g_visible ? L"Скрыть виджет" : L"Показать виджет");
-    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, L"Velox 1.0 · разработчик Sallador");
-    AppendMenuW(m, MF_STRING, ID_EXIT, L"Выход");
+    AppendMenuW(m, MF_STRING, ID_SHOWHIDE, g_visible ? TR(L"Скрыть виджет", L"Hide widget") : TR(L"Показать виджет", L"Show widget"));
+    AppendLangMenu(m, REG_KEY);
+    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, TR(L"Velox 1.1 · разработчик Sallador", L"Velox 1.1 · by Sallador"));
+    AppendMenuW(m, MF_STRING, ID_EXIT, TR(L"Выход", L"Exit"));
     SetForegroundWindow(g_hwnd);
     TrackPopupMenu(m, TPM_RIGHTBUTTON, pt.x, pt.y, 0, g_hwnd, NULL);
     PostMessageW(g_hwnd, WM_NULL, 0, 0);
@@ -816,6 +818,7 @@ static LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM w, LPARAM l) {
     case WM_CLOSE: g_exiting = TRUE; DestroyWindow(h); return 0;
     case WM_COMMAND: {
         int id = LOWORD(w);
+        if (id >= ID_LANG_AUTO && id <= ID_LANG_EN) { g_mutex = NULL; RestartForLang(REG_KEY, id - ID_LANG_AUTO, L"/noelevate"); g_exiting = TRUE; DestroyWindow(h); return 0; }
         if (id >= ID_SORT_DOWN && id <= ID_SORT_TOTAL) SetSort(id - ID_SORT_DOWN);
         else if (id == ID_BITS)      { g_bits = !g_bits; RegSetDw(L"Bits", g_bits); InvalidateRect(h, NULL, FALSE); }
         else if (id == ID_LAN)       { g_countLan = !g_countLan; RegSetDw(L"CountLan", g_countLan); InvalidateRect(h, NULL, FALSE); }
@@ -869,12 +872,13 @@ static BOOL CreateMainWindow() {
 
 int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR cmd, int) {
     g_hInst = hInst;
+    InitLang(REG_KEY);
     g_demo = cmd && wcsstr(cmd, L"/demo") != NULL;
     BOOL noElevate = cmd && wcsstr(cmd, L"/noelevate") != NULL;
     BOOL autostart = cmd && wcsstr(cmd, L"/autostart") != NULL;
     CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 
-    g_mutex = CreateMutexW(NULL, TRUE, g_demo ? L"Local\\Velox_Sallador_Demo" : L"Local\\Velox_Sallador_SingleInstance");
+    g_mutex = g_mutexLang = CreateMutexW(NULL, TRUE, g_demo ? L"Local\\Velox_Sallador_Demo" : L"Local\\Velox_Sallador_SingleInstance");
     DWORD err = GetLastError();
     if (err == ERROR_ALREADY_EXISTS || (!g_mutex && err == ERROR_ACCESS_DENIED)) {
         HWND w = FindWindowW(CLASS_NAME, NULL);

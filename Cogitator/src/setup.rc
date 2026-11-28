@@ -5,5 +5,5 @@ IDI_APP ICON "cogitator.ico"
 IDR_PAYLOAD RCDATA "..\\bin\\Cogitator.exe"
 
 #define VER_DESC "Cogitator Setup (by Sallador)"
-#define VER_ORIGNAME "Cogitator_Setup_2.1.0.exe"
+#define VER_ORIGNAME "Cogitator_Setup_2.2.0.exe"
 #include "version.rc2"
