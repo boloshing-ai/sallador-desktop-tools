@@ -4,7 +4,7 @@
 
 A desktop widget that keeps your remaining **Claude** plan usage always in sight: the current 5-hour session and the weekly limits, with time until each one resets. The same numbers as the `/usage` screen in Claude Code, without opening it.
 
-Version 1.2.0 · Developer: **Sallador**
+Version 1.3.0 · Developer: **Sallador**
 
 <img src="../docs/mensura.png" width="320">
 
@@ -31,12 +31,12 @@ Anthropic has no official public API for subscription usage limits. Mensura does
 
 ## Install
 
-Run `Mensura_Setup_1.2.0.exe` from [Releases](../../../releases). No admin rights needed. It installs to `%LOCALAPPDATA%\Programs\Mensura`. Uninstall from *Settings → Apps*.
+Run `Mensura_Setup_1.3.0.exe` from [Releases](../../../releases). No admin rights needed. It installs to `%LOCALAPPDATA%\Programs\Mensura`. Uninstall from *Settings → Apps*.
 
 Silent install:
 
 ```
-Mensura_Setup_1.2.0.exe /S [/D=<folder>] [/nodesktop] [/noautostart] [/nolaunch]
+Mensura_Setup_1.3.0.exe /S [/D=<folder>] [/nodesktop] [/noautostart] [/nolaunch]
 uninstall.exe /uninstall /S
 ```
 
@@ -46,7 +46,7 @@ Right-click the widget or click **…** for the menu. Drag the widget with the m
 
 ## Build
 
-Visual Studio 2022 (C++ workload) → run `build.bat`. It produces `bin\Mensura.exe` and `dist\Mensura_Setup_1.2.0.exe`.
+Visual Studio 2022 (C++ workload) → run `build.bat`. It produces `bin\Mensura.exe` and `dist\Mensura_Setup_1.3.0.exe`.
 
 Settings are stored in `HKCU\Software\Sallador\Mensura`.
 
@@ -62,7 +62,7 @@ Mensura is an independent project. It is not affiliated with or endorsed by Anth
 
 Виджет для рабочего стола, на котором всегда виден остаток лимитов подписки **Claude**: текущая 5-часовая сессия и недельные лимиты, а также время до их сброса. Те же цифры, что на экране `/usage` в Claude Code, но без необходимости его открывать.
 
-Версия 1.2.0 · Разработчик: **Sallador**
+Версия 1.3.0 · Разработчик: **Sallador**
 
 ## Возможности
 
@@ -87,12 +87,12 @@ Mensura is an independent project. It is not affiliated with or endorsed by Anth
 
 ## Установка
 
-Запустите `Mensura_Setup_1.2.0.exe` из [Releases](../../../releases). Права администратора не нужны. Программа ставится в `%LOCALAPPDATA%\Programs\Mensura`. Удаление — «Параметры → Приложения».
+Запустите `Mensura_Setup_1.3.0.exe` из [Releases](../../../releases). Права администратора не нужны. Программа ставится в `%LOCALAPPDATA%\Programs\Mensura`. Удаление — «Параметры → Приложения».
 
 Тихая установка:
 
 ```
-Mensura_Setup_1.2.0.exe /S [/D=<папка>] [/nodesktop] [/noautostart] [/nolaunch]
+Mensura_Setup_1.3.0.exe /S [/D=<папка>] [/nodesktop] [/noautostart] [/nolaunch]
 uninstall.exe /uninstall /S
 ```
 
@@ -102,7 +102,7 @@ uninstall.exe /uninstall /S
 
 ## Сборка
 
-Visual Studio 2022 (компонент C++) → запустите `build.bat`. Получите `bin\Mensura.exe` и `dist\Mensura_Setup_1.2.0.exe`.
+Visual Studio 2022 (компонент C++) → запустите `build.bat`. Получите `bin\Mensura.exe` и `dist\Mensura_Setup_1.3.0.exe`.
 
 Настройки хранятся в `HKCU\Software\Sallador\Mensura`.
 

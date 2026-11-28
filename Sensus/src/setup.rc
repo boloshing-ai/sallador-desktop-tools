@@ -5,5 +5,5 @@ IDI_APP ICON "sensus.ico"
 IDR_PAYLOAD RCDATA "..\\bin\\Sensus.exe"
 
 #define VER_DESC "Sensus Setup (by Sallador)"
-#define VER_ORIGNAME "Sensus_Setup_1.1.0.exe"
+#define VER_ORIGNAME "Sensus_Setup_1.2.0.exe"
 #include "version.rc2"

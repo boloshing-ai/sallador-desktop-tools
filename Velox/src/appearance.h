@@ -8,11 +8,15 @@
 #include <commdlg.h>
 #pragma comment(lib, "comdlg32.lib")
 
+#define ID_SCALE_BASE   150          // 150…155: 100, 115, 125, 150, 175, 200 %
 #define ID_TRANSP_BASE  160          // 160…167: 0, 20, 40, 50, 60, 70, 80, 90 %
 #define ID_SHADOW       168
 #define ID_COLOR_BASE   170          // 170…178 presets, 179 = custom
 #define ID_COLOR_CUSTOM 179
 
+static int   g_scale = 100;          // widget size: everything (text included) scales with it
+static void (*g_onScale)(void);      // the app re-lays out its window
+static const int kScales[6] = { 100, 115, 125, 150, 175, 200 };
 static int   g_bgTransp;             // 0 = normal window (Acrylic / solid)
 static BOOL  g_shadowOpt = TRUE;
 static DWORD g_textColor;            // 0 = theme colours
@@ -29,6 +33,8 @@ static const ColorPreset kColors[9] = {
     { L"Фиолетовый", L"Violet", 0xB79CFF }, { L"Чёрный",    L"Black",      0x000000 } };
 
 static void LoadAppearance(const WCHAR* key) {
+    g_scale = (int)ReadDw(key, L"Scale", 100);
+    if (g_scale < 100 || g_scale > 200) g_scale = 100;
     g_bgTransp = (int)ReadDw(key, L"BgTransparency", 0);
     if (g_bgTransp < 0 || g_bgTransp > 90) g_bgTransp = 0;
     g_shadowOpt = ReadDw(key, L"TextShadow", 1) != 0;
@@ -89,6 +95,15 @@ static void PresentFrame(HWND h, HDC hdc, Canvas& cv, int w, int hh) {
     }
 }
 static void AppendAppearanceMenu(HMENU m) {
+    HMENU sc = CreatePopupMenu();
+    for (int i = 0; i < 6; i++) {
+        WCHAR s[48];
+        if (kScales[i] == 100) wcscpy_s(s, TR(L"100 % — обычный", L"100 % — normal")); else swprintf_s(s, L"%d %%", kScales[i]);
+        AppendMenuW(sc, MF_STRING | (g_scale == kScales[i] ? MF_CHECKED : 0), ID_SCALE_BASE + i, s);
+    }
+    AppendMenuW(sc, MF_SEPARATOR, 0, NULL);
+    AppendMenuW(sc, MF_STRING | MF_GRAYED, 0, TR(L"Также: Ctrl + колесо мыши над виджетом", L"Also: Ctrl + mouse wheel over the widget"));
+    AppendMenuW(m, MF_POPUP, (UINT_PTR)sc, TR(L"Размер виджета", L"Widget size"));
     HMENU op = CreatePopupMenu(), col = CreatePopupMenu();
     for (int i = 0; i < 8; i++) {
         WCHAR s[64];
@@ -115,6 +130,12 @@ static void AppendAppearanceMenu(HMENU m) {
 // Handles the menu commands above. Returns TRUE when it did; the caller then calls its
 // ApplyBackdrop() (which ends with ApplyLayered) and repaints.
 static BOOL HandleAppearanceCmd(HWND h, int id, const WCHAR* key) {
+    if (id >= ID_SCALE_BASE && id < ID_SCALE_BASE + 6) {
+        g_scale = kScales[id - ID_SCALE_BASE];
+        SaveAppearanceDw(key, L"Scale", g_scale);
+        if (g_onScale) g_onScale();
+        return TRUE;
+    }
     if (id >= ID_TRANSP_BASE && id < ID_TRANSP_BASE + 8) {
         g_bgTransp = kTransp[id - ID_TRANSP_BASE];
         SaveAppearanceDw(key, L"BgTransparency", g_bgTransp);
@@ -138,4 +159,25 @@ static BOOL HandleAppearanceCmd(HWND h, int id, const WCHAR* key) {
         return TRUE;
     }
     return FALSE;
+}
+
+// Ctrl + mouse wheel over the widget: next / previous size. Returns TRUE when it handled the wheel.
+static BOOL ScaleWheel(WPARAM w, const WCHAR* key) {
+    if (!(GET_KEYSTATE_WPARAM(w) & MK_CONTROL)) return FALSE;
+    int i = 0; while (i < 5 && kScales[i] < g_scale) i++;
+    i += GET_WHEEL_DELTA_WPARAM(w) > 0 ? 1 : -1;
+    if (i < 0) i = 0; if (i > 5) i = 5;
+    if (kScales[i] != g_scale) { g_scale = kScales[i]; SaveAppearanceDw(key, L"Scale", g_scale); if (g_onScale) g_onScale(); }
+    return TRUE;
+}
+// Keep a resized window inside its monitor's work area.
+static void KeepOnScreen(HWND h) {
+    RECT r; GetWindowRect(h, &r);
+    MONITORINFO mi = { sizeof(mi) }; GetMonitorInfoW(MonitorFromWindow(h, MONITOR_DEFAULTTONEAREST), &mi);
+    int x = r.left, y = r.top;
+    if (r.right > mi.rcWork.right) x -= r.right - mi.rcWork.right;
+    if (r.bottom > mi.rcWork.bottom) y -= r.bottom - mi.rcWork.bottom;
+    if (x < mi.rcWork.left) x = mi.rcWork.left;
+    if (y < mi.rcWork.top) y = mi.rcWork.top;
+    if (x != r.left || y != r.top) SetWindowPos(h, NULL, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 }

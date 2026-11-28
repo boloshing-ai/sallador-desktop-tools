@@ -1,4 +1,4 @@
-﻿// Mensura 1.2 — desktop widget: remaining Claude plan usage limits (session / weekly).
+﻿// Mensura 1.3 — desktop widget: remaining Claude plan usage limits (session / weekly).
 // Windows 11 (Fluent) edition. Developer: Sallador.  Pure Win32 + GDI+ + WinHTTP, static CRT.
 //
 // Data source: the local Claude Code sign-in (%USERPROFILE%\.claude\.credentials.json) and the
@@ -759,7 +759,7 @@ static void ShowMenu(POINT pt) {
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
     AppendMenuW(m, MF_STRING, ID_SHOWHIDE, g_visible ? TR(L"Скрыть виджет", L"Hide widget") : TR(L"Показать виджет", L"Show widget"));
     AppendLangMenu(m, REG_KEY);
-    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, TR(L"Mensura 1.2 · разработчик Sallador", L"Mensura 1.2 · by Sallador"));
+    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, TR(L"Mensura 1.3 · разработчик Sallador", L"Mensura 1.3 · by Sallador"));
     AppendMenuW(m, MF_STRING, ID_EXIT, TR(L"Выход", L"Exit"));
     SetForegroundWindow(g_hwnd);
     TrackPopupMenu(m, TPM_RIGHTBUTTON, pt.x, pt.y, 0, g_hwnd, NULL);
@@ -769,6 +769,17 @@ static void ShowMenu(POINT pt) {
 static void SavePos() {
     RECT r; GetWindowRect(g_hwnd, &r);
     RegSetDw(L"PosX", (DWORD)r.left); RegSetDw(L"PosY", (DWORD)r.top);
+}
+
+// Widget size (appearance.h): the whole UI is drawn at DPI × scale.
+static void Rescale() {
+    if (!g_hwnd) return;
+    UINT d = GetDpiForWindow(g_hwnd); if (!d) d = 96;
+    g_dpi = d * g_scale / 100;
+    FluentFonts(); Layout(); CanvasFree(g_cv);
+    SetWindowPos(g_hwnd, NULL, 0, 0, g_w, g_h, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+    KeepOnScreen(g_hwnd);
+    InvalidateRect(g_hwnd, NULL, FALSE);
 }
 
 // ───────────────────────────── window proc ───────────────────────────
@@ -810,6 +821,7 @@ static LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM w, LPARAM l) {
         if (w == PBT_APMRESUMEAUTOMATIC) g_nextFetch = GetTickCount64() + 10000;
         break;
     case WM_MOUSEACTIVATE: return MA_NOACTIVATE;
+    case WM_MOUSEWHEEL: if (ScaleWheel(w, REG_KEY)) return 0; break;
     case WM_MOUSEMOVE: {
         if (g_drag) {
             POINT c; GetCursorPos(&c);
@@ -862,7 +874,7 @@ static LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM w, LPARAM l) {
         return 0;
     }
     case WM_DPICHANGED: {
-        g_dpi = HIWORD(w);
+        g_dpi = HIWORD(w) * g_scale / 100;
         FluentFonts(); Layout(); CanvasFree(g_cv);
         RECT* r = (RECT*)l;
         SetWindowPos(h, NULL, r->left, r->top, g_w, g_h, SWP_NOZORDER | SWP_NOACTIVATE);
@@ -931,6 +943,7 @@ static BOOL CreateMainWindow() {
     if (!h) return FALSE;
     g_hwnd = h;
     g_dpi = GetDpiForWindow(h); if (!g_dpi) g_dpi = 96;
+    g_dpi = g_dpi * g_scale / 100;
     FluentFonts();
     Layout();
     ApplyBackdrop();
@@ -950,7 +963,7 @@ static BOOL CreateMainWindow() {
 int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR cmd, int) {
     g_hInst = hInst;
     InitLang(REG_KEY);
-    LoadAppearance(REG_KEY); g_themeHook = ApplyTextColor;
+    LoadAppearance(REG_KEY); g_themeHook = ApplyTextColor; g_onScale = Rescale;
     g_demo = cmd && wcsstr(cmd, L"/demo") != NULL;
     g_mutexLang = CreateMutexW(NULL, TRUE, g_demo ? L"Local\\Mensura_Sallador_Demo" : L"Local\\Mensura_Sallador_SingleInstance");
     if (GetLastError() == ERROR_ALREADY_EXISTS) {

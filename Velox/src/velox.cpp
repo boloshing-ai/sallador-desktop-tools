@@ -1,4 +1,4 @@
-﻿// Velox 1.2 — desktop widget: which applications use the network, their speed and downloaded volume.
+﻿// Velox 1.3 — desktop widget: which applications use the network, their speed and downloaded volume.
 // Windows 11 (Fluent) edition. Developer: Sallador.  Pure Win32 + GDI+ + ETW, static CRT.
 //
 // Per-process traffic comes from a real-time ETW session on the Microsoft-Windows-Kernel-Network
@@ -717,7 +717,7 @@ static void ShowMenu(POINT pt) {
     AppendMenuW(m, MF_SEPARATOR, 0, NULL);
     AppendMenuW(m, MF_STRING, ID_SHOWHIDE, g_visible ? TR(L"Скрыть виджет", L"Hide widget") : TR(L"Показать виджет", L"Show widget"));
     AppendLangMenu(m, REG_KEY);
-    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, TR(L"Velox 1.2 · разработчик Sallador", L"Velox 1.2 · by Sallador"));
+    AppendMenuW(m, MF_STRING | MF_GRAYED, 0, TR(L"Velox 1.3 · разработчик Sallador", L"Velox 1.3 · by Sallador"));
     AppendMenuW(m, MF_STRING, ID_EXIT, TR(L"Выход", L"Exit"));
     SetForegroundWindow(g_hwnd);
     TrackPopupMenu(m, TPM_RIGHTBUTTON, pt.x, pt.y, 0, g_hwnd, NULL);
@@ -727,6 +727,18 @@ static void ShowMenu(POINT pt) {
 static void SavePos() {
     RECT r; GetWindowRect(g_hwnd, &r);
     RegSetDw(L"PosX", (DWORD)r.left); RegSetDw(L"PosY", (DWORD)r.top);
+}
+
+// Widget size (appearance.h): the whole UI is drawn at DPI × scale.
+static void Rescale() {
+    if (!g_hwnd) return;
+    UINT d = GetDpiForWindow(g_hwnd); if (!d) d = 96;
+    g_dpi = d * g_scale / 100;
+    FluentFonts(); ExtraFonts(); Layout(); CanvasFree(g_cv);
+    for (int i = 0; i < g_groupN; i++) { delete g_groups[i].icon; g_groups[i].icon = NULL; g_groups[i].iconTried = g_demo; }     SetWindowPos(g_hwnd, NULL, 0, 0, g_w, g_h, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+
+    KeepOnScreen(g_hwnd);
+    InvalidateRect(g_hwnd, NULL, FALSE);
 }
 
 // ───────────────────────────── window proc ───────────────────────────
@@ -746,6 +758,7 @@ static LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM w, LPARAM l) {
         if (g_tick == 3 || g_tick % 30 == 0) SetProcessWorkingSetSize(GetCurrentProcess(), (SIZE_T)-1, (SIZE_T)-1);
         return 0;
     case WM_MOUSEACTIVATE: return MA_NOACTIVATE;
+    case WM_MOUSEWHEEL: if (ScaleWheel(w, REG_KEY)) return 0; break;
     case WM_MOUSEMOVE: {
         if (g_drag) {
             POINT c; GetCursorPos(&c);
@@ -800,7 +813,7 @@ static LRESULT CALLBACK WndProc(HWND h, UINT msg, WPARAM w, LPARAM l) {
         return 0;
     }
     case WM_DPICHANGED: {
-        g_dpi = HIWORD(w);
+        g_dpi = HIWORD(w) * g_scale / 100;
         FluentFonts(); ExtraFonts(); Layout(); CanvasFree(g_cv);
         for (int i = 0; i < g_groupN; i++) { delete g_groups[i].icon; g_groups[i].icon = NULL; g_groups[i].iconTried = g_demo; }
         RECT* r = (RECT*)l;
@@ -859,6 +872,7 @@ static BOOL CreateMainWindow() {
     g_hwnd = h;
     ChangeWindowMessageFilterEx(h, WM_APP_SHOW, MSGFLT_ALLOW, NULL);   // a non-elevated second start may poke us
     g_dpi = GetDpiForWindow(h); if (!g_dpi) g_dpi = 96;
+    g_dpi = g_dpi * g_scale / 100;
     FluentFonts(); ExtraFonts();
     Layout();
     ApplyBackdrop();
@@ -877,7 +891,7 @@ static BOOL CreateMainWindow() {
 int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR cmd, int) {
     g_hInst = hInst;
     InitLang(REG_KEY);
-    LoadAppearance(REG_KEY); g_themeHook = ApplyTextColor;
+    LoadAppearance(REG_KEY); g_themeHook = ApplyTextColor; g_onScale = Rescale;
     g_demo = cmd && wcsstr(cmd, L"/demo") != NULL;
     BOOL noElevate = cmd && wcsstr(cmd, L"/noelevate") != NULL;
     BOOL autostart = cmd && wcsstr(cmd, L"/autostart") != NULL;

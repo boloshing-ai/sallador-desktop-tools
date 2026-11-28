@@ -1,7 +1,7 @@
 // shared version block; define VER_DESC and VER_ORIGNAME before including
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,0,0
- PRODUCTVERSION 1,2,0,0
+ FILEVERSION 1,3,0,0
+ PRODUCTVERSION 1,3,0,0
  FILEFLAGSMASK 0x3fL
  FILEFLAGS 0x0L
  FILEOS VOS_NT_WINDOWS32
@@ -14,12 +14,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Sallador"
             VALUE "FileDescription", VER_DESC
-            VALUE "FileVersion", "1.2.0.0"
+            VALUE "FileVersion", "1.3.0.0"
             VALUE "InternalName", "Velox"
             VALUE "LegalCopyright", "(c) 2026 Sallador"
             VALUE "OriginalFilename", VER_ORIGNAME
             VALUE "ProductName", "Velox"
-            VALUE "ProductVersion", "1.2.0.0"
+            VALUE "ProductVersion", "1.3.0.0"
             VALUE "Comments", "Developer: Sallador"
         END
     END

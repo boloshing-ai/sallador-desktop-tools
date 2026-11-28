@@ -4,7 +4,7 @@
 
 Desktop widget for Windows 11 that shows, once per second, the **10 applications** using the most **CPU**, **GPU** and **RAM**, plus overall system load.
 
-Version 2.3.0 · Developer: **Sallador**
+Version 2.4.0 · Developer: **Sallador**
 
 <img src="../docs/cogitator.png" width="360">
 
@@ -24,12 +24,12 @@ Version 2.3.0 · Developer: **Sallador**
 
 ## Install
 
-Run `Cogitator_Setup_2.3.0.exe` from [Releases](../../../releases). No admin rights needed. It installs to `%LOCALAPPDATA%\Programs\Cogitator`, adds a Start menu entry and optionally a desktop shortcut and autostart. Uninstall from *Settings → Apps → Installed apps*.
+Run `Cogitator_Setup_2.4.0.exe` from [Releases](../../../releases). No admin rights needed. It installs to `%LOCALAPPDATA%\Programs\Cogitator`, adds a Start menu entry and optionally a desktop shortcut and autostart. Uninstall from *Settings → Apps → Installed apps*.
 
 Silent install:
 
 ```
-Cogitator_Setup_2.3.0.exe /S [/D=<folder>] [/nodesktop] [/noautostart] [/nolaunch]
+Cogitator_Setup_2.4.0.exe /S [/D=<folder>] [/nodesktop] [/noautostart] [/nolaunch]
 uninstall.exe /uninstall /S
 ```
 
@@ -45,7 +45,7 @@ uninstall.exe /uninstall /S
 
 ## Build
 
-Visual Studio 2022 (C++ workload) → run `build.bat`. It produces `bin\Cogitator.exe` and `dist\Cogitator_Setup_2.3.0.exe`. The installer embeds the widget.
+Visual Studio 2022 (C++ workload) → run `build.bat`. It produces `bin\Cogitator.exe` and `dist\Cogitator_Setup_2.4.0.exe`. The installer embeds the widget.
 
 Settings are stored in `HKCU\Software\Sallador\Cogitator`.
 
@@ -59,7 +59,7 @@ Settings are stored in `HKCU\Software\Sallador\Cogitator`.
 
 Виджет для рабочего стола Windows 11: раз в секунду показывает **10 приложений**, которые больше всего нагружают **ЦП**, **ГП** и **память**, и общую загрузку системы.
 
-Версия 2.3.0 · Разработчик: **Sallador**
+Версия 2.4.0 · Разработчик: **Sallador**
 
 ## Возможности
 
@@ -77,12 +77,12 @@ Settings are stored in `HKCU\Software\Sallador\Cogitator`.
 
 ## Установка
 
-Запустите `Cogitator_Setup_2.3.0.exe` из [Releases](../../../releases). Права администратора не нужны. Программа ставится в `%LOCALAPPDATA%\Programs\Cogitator`, добавляет ярлык в меню «Пуск», по желанию — ярлык на рабочем столе и автозапуск. Удаление — «Параметры → Приложения → Установленные приложения».
+Запустите `Cogitator_Setup_2.4.0.exe` из [Releases](../../../releases). Права администратора не нужны. Программа ставится в `%LOCALAPPDATA%\Programs\Cogitator`, добавляет ярлык в меню «Пуск», по желанию — ярлык на рабочем столе и автозапуск. Удаление — «Параметры → Приложения → Установленные приложения».
 
 Тихая установка:
 
 ```
-Cogitator_Setup_2.3.0.exe /S [/D=<папка>] [/nodesktop] [/noautostart] [/nolaunch]
+Cogitator_Setup_2.4.0.exe /S [/D=<папка>] [/nodesktop] [/noautostart] [/nolaunch]
 uninstall.exe /uninstall /S
 ```
 
@@ -98,6 +98,6 @@ uninstall.exe /uninstall /S
 
 ## Сборка
 
-Visual Studio 2022 (компонент C++) → запустите `build.bat`. Получите `bin\Cogitator.exe` и `dist\Cogitator_Setup_2.3.0.exe`. Установщик содержит виджет внутри.
+Visual Studio 2022 (компонент C++) → запустите `build.bat`. Получите `bin\Cogitator.exe` и `dist\Cogitator_Setup_2.4.0.exe`. Установщик содержит виджет внутри.
 
 Настройки хранятся в `HKCU\Software\Sallador\Cogitator`.

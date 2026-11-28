@@ -4,7 +4,7 @@
 
 A desktop widget with your PC's sensors: clocks, loads, memory, temperatures, fans, power and network. Show only what you need: every sensor can be turned on or off.
 
-Version 1.1.0 · Developer: **Sallador**
+Version 1.2.0 · Developer: **Sallador**
 
 <img src="../docs/sensus.png" width="340">
 
@@ -40,12 +40,12 @@ Windows does not let ordinary programs read CPU and motherboard sensors without 
 
 ## Install
 
-Run `Sensus_Setup_1.1.0.exe` from [Releases](../../../releases). No admin rights needed. It installs to `%LOCALAPPDATA%\Programs\Sensus`. Uninstall from *Settings → Apps*.
+Run `Sensus_Setup_1.2.0.exe` from [Releases](../../../releases). No admin rights needed. It installs to `%LOCALAPPDATA%\Programs\Sensus`. Uninstall from *Settings → Apps*.
 
 Silent install:
 
 ```
-Sensus_Setup_1.1.0.exe /S [/D=<folder>] [/nodesktop] [/noautostart] [/nolaunch]
+Sensus_Setup_1.2.0.exe /S [/D=<folder>] [/nodesktop] [/noautostart] [/nolaunch]
 uninstall.exe /uninstall /S
 ```
 
@@ -53,7 +53,7 @@ uninstall.exe /uninstall /S
 
 ## Build
 
-Visual Studio 2022 (C++ workload) → run `build.bat`. It produces `bin\Sensus.exe` and `dist\Sensus_Setup_1.1.0.exe`.
+Visual Studio 2022 (C++ workload) → run `build.bat`. It produces `bin\Sensus.exe` and `dist\Sensus_Setup_1.2.0.exe`.
 
 Settings are stored in `HKCU\Software\Sallador\Sensus`.
 
@@ -67,7 +67,7 @@ Settings are stored in `HKCU\Software\Sallador\Sensus`.
 
 Виджет для рабочего стола с датчиками компьютера: частоты, загрузка, память, температуры, вентиляторы, мощность и сеть. Показывает только то, что вам нужно: любой параметр можно включить или выключить.
 
-Версия 1.1.0 · Разработчик: **Sallador**
+Версия 1.2.0 · Разработчик: **Sallador**
 
 ## Что показывает
 
@@ -101,12 +101,12 @@ Windows не даёт обычным программам читать датч�
 
 ## Установка
 
-Запустите `Sensus_Setup_1.1.0.exe` из [Releases](../../../releases). Права администратора не нужны. Программа ставится в `%LOCALAPPDATA%\Programs\Sensus`. Удаление — «Параметры → Приложения».
+Запустите `Sensus_Setup_1.2.0.exe` из [Releases](../../../releases). Права администратора не нужны. Программа ставится в `%LOCALAPPDATA%\Programs\Sensus`. Удаление — «Параметры → Приложения».
 
 Тихая установка:
 
 ```
-Sensus_Setup_1.1.0.exe /S [/D=<папка>] [/nodesktop] [/noautostart] [/nolaunch]
+Sensus_Setup_1.2.0.exe /S [/D=<папка>] [/nodesktop] [/noautostart] [/nolaunch]
 uninstall.exe /uninstall /S
 ```
 
@@ -114,6 +114,6 @@ uninstall.exe /uninstall /S
 
 ## Сборка
 
-Visual Studio 2022 (компонент C++) → запустите `build.bat`. Получите `bin\Sensus.exe` и `dist\Sensus_Setup_1.1.0.exe`.
+Visual Studio 2022 (компонент C++) → запустите `build.bat`. Получите `bin\Sensus.exe` и `dist\Sensus_Setup_1.2.0.exe`.
 
 Настройки хранятся в `HKCU\Software\Sallador\Sensus`.

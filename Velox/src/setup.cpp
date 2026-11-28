@@ -1,4 +1,4 @@
-﻿// Velox Setup 1.2 — Windows 11 (Fluent) installer / uninstaller. Developer: Sallador.
+﻿// Velox Setup 1.3 — Windows 11 (Fluent) installer / uninstaller. Developer: Sallador.
 // Velox reads per-process traffic from an ETW kernel session, which needs administrator rights,
 // so this installer runs elevated: it installs to %ProgramFiles%\Velox and registers two
 // Task Scheduler tasks (see tasks.h) so the widget starts elevated without a UAC prompt.
@@ -31,7 +31,7 @@
 
 #define APP_NAME     L"Velox"
 #define APP_EXE      L"Velox.exe"
-#define APP_VERSION  L"1.2.0"
+#define APP_VERSION  L"1.3.0"
 #define PUBLISHER    L"Sallador"
 #define APP_CLASS    L"VeloxWidget"
 #define REG_APP      L"Software\\Sallador\\Velox"

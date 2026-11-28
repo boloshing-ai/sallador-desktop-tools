@@ -1,4 +1,4 @@
-﻿// Mensura Setup 1.2 — Windows 11 (Fluent) installer / uninstaller. Developer: Sallador.
+﻿// Mensura Setup 1.3 — Windows 11 (Fluent) installer / uninstaller. Developer: Sallador.
 // Per-user install (no admin): %LOCALAPPDATA%\Programs\Mensura
 //
 //   Setup.exe                                  interactive install
@@ -29,7 +29,7 @@
 
 #define APP_NAME     L"Mensura"
 #define APP_EXE      L"Mensura.exe"
-#define APP_VERSION  L"1.2.0"
+#define APP_VERSION  L"1.3.0"
 #define PUBLISHER    L"Sallador"
 #define APP_CLASS    L"MensuraWidget"
 #define REG_APP      L"Software\\Sallador\\Mensura"

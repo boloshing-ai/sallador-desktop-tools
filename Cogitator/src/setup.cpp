@@ -1,4 +1,4 @@
-﻿// Cogitator Setup 2.3 — Windows 11 (Fluent) installer / uninstaller. Developer: Sallador.
+﻿// Cogitator Setup 2.4 — Windows 11 (Fluent) installer / uninstaller. Developer: Sallador.
 // Per-user install (no admin): %LOCALAPPDATA%\Programs\Cogitator
 //
 //   Setup.exe                                  interactive install
@@ -29,7 +29,7 @@
 
 #define APP_NAME     L"Cogitator"
 #define APP_EXE      L"Cogitator.exe"
-#define APP_VERSION  L"2.3.0"
+#define APP_VERSION  L"2.4.0"
 #define PUBLISHER    L"Sallador"
 #define APP_CLASS    L"CogitatorWidget"
 #define OLD_CLASS    L"Cogitator40kWidget"                 // v2.0
